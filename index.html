@@ -248,7 +248,7 @@ async function analyzeImage() {
 
   let apiKey = localStorage.getItem('anthropic_api_key');
   if(!apiKey) {
-    apiKey = prompt("Wklej swój NOWY Anthropic API Key (zaczynający się od sk-ant-):");
+    apiKey = prompt("Wklej swój Anthropic API Key (zaczynający się od sk-ant-):");
     if(!apiKey) {
       alert("Klucz API jest wymagany do analizy.");
       return;
@@ -275,11 +275,8 @@ Przypisz dokładną porę roku: Jasna Wiosna, Czysta Wiosna, Ciepła Wiosna, Jas
 Odpowiedz WYŁĄCZNIE poprawnym JSON bez żadnego Markdown ani backtick, w tej strukturze:
 {"season":"nazwa PL","season_category":"Wiosna|Lato|Jesień|Zima","confidence":85,"undertone":"Ciepły|Chłodny|Neutralny","contrast":"Wysoki|Średni|Niski","saturation":"Żywe|Stonowane|Neutralne","skin":"jasna|średnia|głęboka","description":"2-3 zdania o Twojej kolorystyce urody","best_colors":["#hex1","#hex2","#hex3","#hex4","#hex5","#hex6"],"best_colors_names":["nazwa1","nazwa2","nazwa3","nazwa4","nazwa5","nazwa6"],"avoid_colors":["#hex1","#hex2","#hex3"],"avoid_colors_names":["nazwa1","nazwa2","nazwa3"],"makeup":"wskazówki makijażowe","hair":"wskazówki dot. włosów","style":"wskazówka stylizacyjna","celebrities":["Imię Nazwisko 1","Imię Nazwisko 2","Imię Nazwisko 3"]}`;
 
-  // TUTAJSZA ZMIANA: Przekierowanie przez bezpieczne i otwarte proxy corsproxy.io
-  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages');
-
   try {
-    const response = await fetch(proxyUrl, {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -306,7 +303,7 @@ Odpowiedz WYŁĄCZNIE poprawnym JSON bez żadnego Markdown ani backtick, w tej s
 
     clearInterval(msgInterval);
     if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
+      const errData = await response.json();
       throw new Error(errData.error?.message || `Błąd serwera (${response.status})`);
     }
 
@@ -322,6 +319,10 @@ Odpowiedz WYŁĄCZNIE poprawnym JSON bez żadnego Markdown ani backtick, w tej s
     document.getElementById('upload-section').style.display = 'block';
     
     let errMsg = err.message;
+    if(errMsg.includes('cors') || errMsg.includes('Fetch')) {
+      errMsg = "Błąd połączenia (CORS). Przeglądarki domyślnie blokują bezpośrednie zapytania API ze względów bezpieczeństwa.";
+    }
+
     document.getElementById('upload-section').insertAdjacentHTML('afterbegin',
       `<div class="error-box">Nie udało się przeprowadzić analizy.<br><small style="opacity:0.8;font-size:12px">${errMsg}</small></div>`);
   }
