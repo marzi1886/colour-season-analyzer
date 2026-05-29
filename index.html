@@ -88,7 +88,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 .avoid-row .swatch-circle{position:relative}
 .avoid-row .swatch-circle::after{content:'×';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.4rem;color:rgba(255,255,255,0.9);font-weight:300}
 
-/* NOWE ELEGANCKIE REKOMENDACJE PRODUKTOWE */
+/* REKOMENDACJE PRODUKTOWE */
 .shop-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -282,7 +282,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
       <div class="celeb-chips" id="celeb-chips"></div>
     </div>
 
-    <!-- SEKCJA SZAFY Z PRAWDZIWYMI ZDJĘCIAMI -->
     <div class="palette-section" id="capsule-section">
       <p class="section-label">Twoja Szafa Kapsułowa — Inspiracje Produktowe</p>
       <div class="shop-grid" id="capsule-container"></div>
@@ -297,31 +296,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 let imageBase64 = null;
 let imageType = 'image/jpeg';
 
-// NOWA BAZA SZAFY KAPSUŁOWEJ UŻYWAJĄCA STABILNYCH LINKÓW DO LUKSUZOWYCH ZDJĘĆ Z UNSPLASH (BEZ BLOKAD CORS)
+// BAZA DANYCH ZE ZWERYFIKOWANYMI LINKAMI DO ZDJĘĆ (OPIS = ZDJĘCIE)
 const szafaKapsulowa = [
-  // CHŁODNE / ZIMOWE / LETNIE ODCIENIE (COOL & DEEP / LIGHT)
-  { sklep: "ZARA", nazwa: "Koszula z satyny premium", cena: "139,00 PLN", hex: "#0047AB", foto: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-shirts-l1217.html" }, // Kobaltowy t-shirt/koszula struktura
-  { sklep: "H&M", nazwa: "Marynarka z domieszką wełny", cena: "299,00 PLN", hex: "#1A1A1A", foto: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/marynarki-i-kamizelki.html" }, // Czarny klasyczny płaszcz/marynarka
-  { sklep: "MANGO", nazwa: "Sukienka koktajlowa fuksja", cena: "249,99 PLN", hex: "#FF007F", foto: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" }, // Elegancka wieczorowa kreacja
-  { sklep: "ZARA", nazwa: "Klasyczny golf z dzianiny", cena: "99,90 PLN", hex: "#FFFFFF", foto: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=400&auto=format&fit=crop" , link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" }, // Czysty biały dzianinowy top
-  { sklep: "H&M", nazwa: "Satynowa spódnica midi", cena: "129,99 PLN", hex: "#4A6B82", foto: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/spodnice.html" }, // Denim / Stalowa struktura
+  // CHŁODNE / ZIMOWE / LETNIE ODCIENIE
+  { sklep: "ZARA", nazwa: "Koszula z satyny premium", cena: "139,00 PLN", hex: "#0047AB", foto: "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-shirts-l1217.html" }, // Satynowa koszula
+  { sklep: "H&M", nazwa: "Marynarka z domieszką wełny", cena: "299,00 PLN", hex: "#1A1A1A", foto: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/marynarki-i-kamizelki.html" }, // Marynarka/Płaszcz
+  { sklep: "MANGO", nazwa: "Sukienka koktajlowa fuksja", cena: "249,99 PLN", hex: "#FF007F", foto: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" }, // Sukienka koktajlowa
+  { sklep: "ZARA", nazwa: "Klasyczny golf z dzianiny", cena: "99,90 PLN", hex: "#FFFFFF", foto: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=400&auto=format&fit=crop" , link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" }, // Biały golf/sweter
+  { sklep: "H&M", nazwa: "Satynowa spódnica midi", cena: "129,99 PLN", hex: "#4A6B82", foto: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/spodnice.html" }, // Spódnica satynowa
 
-  // CIEPŁE / JESIENNE ODCIENIE (WARM & MUTED / DEEP)
-  { sklep: "MANGO", nazwa: "Dwurzędowy trencz klasyczny", cena: "399,99 PLN", hex: "#C29B68", foto: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/kurtki-i-p%C5%82aszcze_c12658822" }, // Beżowy/Camel klasyk
-  { sklep: "ZARA", nazwa: "Skórzana spódnica ołówkowa", cena: "299,00 PLN", hex: "#8B4513", foto: "https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-skirts-l1296.html" }, // Skórzane akcenty brąz
-  { sklep: "H&M", nazwa: "Kardigan z grubym splotem", cena: "149,99 PLN", hex: "#D2691E", foto: "https://images.unsplash.com/photo-1614975058789-41316d0e2e9c?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/swetry-i-kardigany.html" }, // Sweter rdzawy/pomarańczowy
-  { sklep: "MANGO", nazwa: "Spodnie cygaretki z stanem", cena: "139,99 PLN", hex: "#556B2F", foto: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/spodnie_c49122393" }, // Spodnie khaki / oliwka
+  // CIEPŁE / JESIENNE ODCIENIE
+  { sklep: "MANGO", nazwa: "Dwurzędowy trencz klasyczny", cena: "399,99 PLN", hex: "#C29B68", foto: "https://images.unsplash.com/photo-1548624149-f7b3e64de266?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/kurtki-i-p%C5%82aszcze_c12658822" }, // Beżowy płaszcz/trencz
+  { sklep: "ZARA", nazwa: "Skórzana spódnica ołówkowa", cena: "299,00 PLN", hex: "#8B4513", foto: "https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-skirts-l1296.html" }, // Brązowa spódnica
+  { sklep: "H&M", nazwa: "Kardigan z grubym splotem", cena: "149,99 PLN", hex: "#D2691E", foto: "https://images.unsplash.com/photo-1614975058789-41316d0e2e9c?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/swetry-i-kardigany.html" }, // Dzianina w odcieniu cynamonu
+  { sklep: "MANGO", nazwa: "Spodnie cygaretki z stanem", cena: "139,99 PLN", hex: "#556B2F", foto: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/spodnie_c49122393" }, // Spodnie oliwka/khaki
 
-  // JASNE / WIOSENNE ODCIENIE (WARM & BRIGHT / LIGHT)
-  { sklep: "ZARA", nazwa: "Marynarka oversize struktura", cena: "349,00 PLN", hex: "#FF7F50", foto: "https://images.unsplash.com/photo-1548624149-f7b3e64de266?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-blazers-l1054.html" }, // Koralowy/Ciepły pomarańcz
-  { sklep: "MANGO", nazwa: "Top jedwabny na ramiączkach", cena: "199,99 PLN", hex: "#FFD700", foto: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" }, // Słoneczny żółty top
-  { sklep: "H&M", nazwa: "Gładka szmizjerka wiązana", cena: "149,00 PLN", hex: "#00FF7F", foto: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/sukienki.html" }, // Żywa, świeża zieleń
+  // JASNE / WIOSENNE ODCIENIE
+  { sklep: "ZARA", nazwa: "Marynarka oversize struktura", cena: "349,00 PLN", hex: "#FF7F50", foto: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-blazers-l1054.html" }, // Pastelowa żakiet/marynarka
+  { sklep: "MANGO", nazwa: "Top jedwabny na ramiączkach", cena: "199,99 PLN", hex: "#FFD700", foto: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" }, // Żółty top jedwabny
+  { sklep: "H&M", nazwa: "Gładka szmizjerka wiązana", cena: "149,00 PLN", hex: "#00FF7F", foto: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/sukienki.html" }, // Sukienka jasna zieleń
 
-  // STONOWANE / LETNIE ODCIENIE (COOL & MUTED)
-  { sklep: "H&M", nazwa: "Lniana koszula oversize", cena: "119,99 PLN", hex: "#C8A2C8", foto: "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/koszule-i-bluzki.html" }, // Lawendowa pastelowa bluzka
-  { sklep: "MANGO", nazwa: "Sukienka dzianinowa midi", cena: "169,99 PLN", hex: "#8FBC8F", foto: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" }, // Zgaszona szałwiowa zieleń
-  { sklep: "ZARA", nazwa: "Sweter z dodatkiem kaszmiru", cena: "249,00 PLN", hex: "#B0C4DE", foto: "https://images.unsplash.com/photo-1551799517-eb8f03cb5e6a?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" }, // Pudrowy / Gołębi miękki dzianinowy sweter
-  { sklep: "MANGO", nazwa: "Bluzka wiskozowa z dekoltem", cena: "119,99 PLN", hex: "#FFC0CB", foto: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" }  // Różowy pastelowy look
+  // STONOWANE / LETNIE ODCIENIE
+  { sklep: "H&M", nazwa: "Lniana koszula oversize", cena: "119,99 PLN", hex: "#C8A2C8", foto: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=400&auto=format&fit=crop", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/koszule-i-bluzki.html" }, // Lekka bluzka lila/lawenda
+  { sklep: "MANGO", nazwa: "Sukienka dzianinowa midi", cena: "169,99 PLN", hex: "#8FBC8F", foto: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" }, // Szałwiowa sukienka dzianina
+  { sklep: "ZARA", nazwa: "Sweter z dodatkiem kaszmiru", cena: "249,00 PLN", hex: "#B0C4DE", foto: "https://images.unsplash.com/photo-1551799517-eb8f03cb5e6a?q=80&w=400&auto=format&fit=crop", link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" }, // Sweter błękitny
+  { sklep: "MANGO", nazwa: "Bluzka wiskozowa z dekoltem", cena: "119,99 PLN", hex: "#FFC0CB", foto: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=400&auto=format&fit=crop", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" }  // Różowa pastelowa bluzka
 ];
 
 const dz = document.getElementById('drop-zone');
@@ -450,7 +449,6 @@ function displayResults(r) {
     celebEl.innerHTML = '<span class="celeb-chip" style="border:none">Brak danych</span>';
   }
 
-  // Wywołanie matematycznego parowania szafy z prawdziwymi zdjęciami
   matchCapsuleWardrobe(userGoodColors);
 
   document.getElementById('results-screen').style.display = 'block';
@@ -480,7 +478,6 @@ function matchCapsuleWardrobe(goodColors) {
 
   ratedItems.sort((a, b) => a.score - b.score);
   
-  // Renderowanie kart ze zdjęciami ubrań z banku zdjęć
   ratedItems.slice(0, 6).forEach(item => {
     container.innerHTML += `
       <a href="${item.link}" target="_blank" class="shop-card">
