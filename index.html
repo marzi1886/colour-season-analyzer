@@ -3,6 +3,8 @@
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- DODANO: Biblioteka do generowania PDF bezpośrednio w przeglądarce -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -99,7 +101,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 /* ERROR */
 .error-box{background:#FFF8F8;border:1px solid #F5C1C1;padding:1.5rem;text-align:center;margin:1.5rem 0;color:#993535;font-size:14px;border-radius:2px}
 
-.btn-again{display:block;width:100%;padding:1rem;background:transparent;color:var(--text-dark);border:1px solid var(--text-dark);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s;margin-top:2rem}
+/* DODANO: Przycisk Pobierz PDF dopasowany do Twojego stylu */
+.btn-pdf {
+  display: block;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--text-dark);
+  color: var(--gold-light);
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  text-align: center;
+}
+.btn-pdf:hover {
+  background: var(--gold-dark);
+  color: var(--white);
+}
+
+.btn-again{display:block;width:100%;padding:1rem;background:transparent;color:var(--text-dark);border:1px solid var(--text-dark);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s;margin-top:0.75rem}
 .btn-again:hover{background:var(--text-dark);color:var(--gold-light)}
 
 /* SEASON COLOR THEMES */
@@ -145,39 +169,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 </div>
 
 <div class="results-screen" id="results-screen">
-  <div id="season-hero" class="season-hero">
-    <div id="season-badge" class="season-badge">Twoja pora roku</div>
-    <h2 class="serif season-name" id="season-name">—</h2>
-    <p class="season-conf" id="season-conf">Pewność analizy</p>
-    <div class="conf-bar"><div class="conf-fill" id="conf-fill" style="width:0%"></div></div>
-    <p class="season-desc" id="season-desc" style="margin-top:1.5rem"></p>
+  
+  <!-- DODANO: Kontener owijający cały dotychczasowy raport (tylko to drukuje się do PDF) -->
+  <div id="pdf-capture-area" style="background: #FAF7F2; padding: 2px;">
+    <div id="season-hero" class="season-hero">
+      <div id="season-badge" class="season-badge">Twoja pora roku</div>
+      <h2 class="serif season-name" id="season-name">—</h2>
+      <p class="season-conf" id="season-conf">Pewność analizy</p>
+      <div class="conf-bar"><div class="conf-fill" id="conf-fill" style="width:0%"></div></div>
+      <p class="season-desc" id="season-desc" style="margin-top:1.5rem"></p>
+    </div>
+
+    <div class="traits-grid">
+      <div class="trait-cell"><p class="trait-label">Podton skóry</p><p class="trait-value" id="trait-undertone">—</p></div>
+      <div class="trait-cell"><p class="trait-label">Kontrast</p><p class="trait-value" id="trait-contrast">—</p></div>
+      <div class="trait-cell"><p class="trait-label">Nasycenie</p><p class="trait-value" id="trait-saturation">—</p></div>
+      <div class="trait-cell"><p class="trait-label">Pigmentacja</p><p class="trait-value" id="trait-skin">—</p></div>
+    </div>
+
+    <div class="palette-section">
+      <p class="section-label">Twoje kolory — noś je śmiało</p>
+      <div class="colors-row" id="best-colors"></div>
+      <p class="section-label" style="margin-top:1.5rem">Kolory do unikania</p>
+      <div class="colors-row avoid-row" id="avoid-colors"></div>
+    </div>
+
+    <div class="tips-grid">
+      <div class="tip-card"><p class="tip-icon">💄</p><p class="tip-title">Makijaż</p><p class="tip-text" id="tip-makeup">—</p></div>
+      <div class="tip-card"><p class="tip-icon">💇</p><p class="tip-title">Włosy</p><p class="tip-text" id="tip-hair">—</p></div>
+      <div class="tip-card"><p class="tip-icon">👗</p><p class="tip-title">Stylizacja</p><p class="tip-text" id="tip-style">—</p></div>
+    </div>
+
+    <div class="celeb-section">
+      <p class="section-label">Znane osoby z Twoją porą roku</p>
+      <div class="celeb-chips" id="celeb-chips"></div>
+    </div>
   </div>
 
-  <div class="traits-grid">
-    <div class="trait-cell"><p class="trait-label">Podton skóry</p><p class="trait-value" id="trait-undertone">—</p></div>
-    <div class="trait-cell"><p class="trait-label">Kontrast</p><p class="trait-value" id="trait-contrast">—</p></div>
-    <div class="trait-cell"><p class="trait-label">Nasycenie</p><p class="trait-value" id="trait-saturation">—</p></div>
-    <div class="trait-cell"><p class="trait-label">Pigmentacja</p><p class="trait-value" id="trait-skin">—</p></div>
-  </div>
-
-  <div class="palette-section">
-    <p class="section-label">Twoje kolory — noś je śmiało</p>
-    <div class="colors-row" id="best-colors"></div>
-    <p class="section-label" style="margin-top:1.5rem">Kolory do unikania</p>
-    <div class="colors-row avoid-row" id="avoid-colors"></div>
-  </div>
-
-  <div class="tips-grid">
-    <div class="tip-card"><p class="tip-icon">💄</p><p class="tip-title">Makijaż</p><p class="tip-text" id="tip-makeup">—</p></div>
-    <div class="tip-card"><p class="tip-icon">💇</p><p class="tip-title">Włosy</p><p class="tip-text" id="tip-hair">—</p></div>
-    <div class="tip-card"><p class="tip-icon">👗</p><p class="tip-title">Stylizacja</p><p class="tip-text" id="tip-style">—</p></div>
-  </div>
-
-  <div class="celeb-section">
-    <p class="section-label">Znane osoby z Twoją porą roku</p>
-    <div class="celeb-chips" id="celeb-chips"></div>
-  </div>
-
+  <!-- DODANO: Guzik do pobierania (poza strefą druku, by nie powielał się na dokumencie) -->
+  <button class="btn-pdf" id="download-pdf-btn" onclick="generatePDF()">📥 Pobierz raport PDF</button>
   <button class="btn-again" onclick="resetAll()">Analizuj nowe zdjęcie</button>
 </div>
 
@@ -234,7 +264,6 @@ async function analyzeImage() {
     document.getElementById('loading-msg').textContent = loadingMsgs[msgIdx];
   }, 1800);
 
-  // Wklej w poniższe pole swój "Test URL" z n8n:
   const n8nWebhookUrl = 'https://marzi91.app.n8n.cloud/webhook/analiza-kolorystyczna';
 
   try {
@@ -323,6 +352,22 @@ function resetAll() {
   document.getElementById('preview-box').style.display = 'none';
   document.getElementById('file-input').value = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// DODANO: Funkcja do pobierania dokumentu w Twoich stałych kolorach
+function generatePDF() {
+  const element = document.getElementById('pdf-capture-area');
+  const seasonName = document.getElementById('season-name').textContent;
+  
+  const opt = {
+    margin:       [10, 10, 10, 10],
+    filename:     `Raport_Analizy_${seasonName.replace(/\s+/g, '_')}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#FAF7F2' }, // Wymuszamy zachowanie Twojego tła cream
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
 }
 </script>
 </body>
