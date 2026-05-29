@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colour Season Analyst - Beauty Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -87,6 +88,69 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 .avoid-row .swatch-circle{position:relative}
 .avoid-row .swatch-circle::after{content:'×';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.4rem;color:rgba(255,255,255,0.9);font-weight:300}
 
+/* NOWA SEKCJA: CAPSULE CLOTHES SHOPPING */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-top: 1rem;
+}
+@media (min-width: 480px) {
+  .shop-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.shop-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.shop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(201,169,110,0.15);
+}
+.shop-img-fallback {
+  width: 100%;
+  height: 130px;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.shop-brand {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.shop-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dark);
+  line-height: 1.3;
+  margin-bottom: 5px;
+  height: 32px;
+  overflow: hidden;
+}
+.shop-price {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--gold-dark);
+}
+
 /* TIPS */
 .tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
 .tip-card{background:var(--white);border:1px solid var(--border);padding:1.5rem}
@@ -102,7 +166,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 /* ERROR */
 .error-box{background:#FFF8F8;border:1px solid #F5C1C1;padding:1.5rem;text-align:center;margin:1.5rem 0;color:#993535;font-size:14px;border-radius:2px}
 
-/* PRZYCISKI AKCJI */
+/* PRZYCISKI DOLNE */
 .btn-pdf {
   display: block;
   width: 100%;
@@ -194,6 +258,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
       <div class="colors-row avoid-row" id="avoid-colors"></div>
     </div>
 
+    <div class="palette-section" id="capsule-section">
+      <p class="section-label">Twoja Szafa Kapsułowa — Inspiracje z Sieciówek</p>
+      <div class="shop-grid" id="capsule-container"></div>
+    </div>
+
     <div class="tips-grid">
       <div class="tip-card"><p class="tip-icon">💄</p><p class="tip-title">Makijaż</p><p class="tip-text" id="tip-makeup">—</p></div>
       <div class="tip-card"><p class="tip-icon">💇</p><p class="tip-title">Włosy</p><p class="tip-text" id="tip-hair">—</p></div>
@@ -213,6 +282,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 <script>
 let imageBase64 = null;
 let imageType = 'image/jpeg';
+
+// BAZA SZAFY KAPSUŁOWEJ (2026) — PRZYGOTOWANA PRZEZ EKSPERTA MODOWEGO AI
+const szafaKapsulowa = [
+  // COLD / WINTER / COOL SUMMER ITEMS
+  { sklep: "ZARA", nazwa: "Koszula z satyny premium", cena: "139,00 PLN", hex: "#0047AB", link: "https://www.zara.com/pl/pl/woman-shirts-l1217.html" }, // Kobalt
+  { sklep: "H&M", nazwa: "Marynarka z domieszką wełny", cena: "299,00 PLN", hex: "#1A1A1A", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/marynarki-i-kamizelki.html" }, // Głęboka czerń
+  { sklep: "MANGO", nazwa: "Sukienka koktajlowa fuksja", cena: "249,99 PLN", hex: "#FF007F", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" }, // Fuksja
+  { sklep: "ZARA", nazwa: "Klasyczny golf z dzianiny", cena: "99,90 PLN", hex: "#FFFFFF", link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" }, // Czysta biel
+  { sklep: "H&M", nazwa: "Satynowa spódnica midi", cena: "129,99 PLN", hex: "#4A6B82", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/spodnice.html" }, // Stalowy błękit
+
+  // WARM / AUTUMN ITEMS
+  { sklep: "MANGO", nazwa: "Dwurzędowy trencz klasyczny", cena: "399,99 PLN", hex: "#C29B68", link: "https://shop.mango.com/pl/kobieta/kurtki-i-płaszcze_c12658822" }, // Camel / Ciepły beż
+  { sklep: "ZARA", nazwa: "Skórzana spódnica ołówkowa", cena: "299,00 PLN", hex: "#8B4513", link: "https://www.zara.com/pl/pl/woman-skirts-l1296.html" }, // Czekoladowy brąz
+  { sklep: "H&M", nazwa: "Kardigan z grubym splotem", cena: "149,99 PLN", hex: "#D2691E", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/swetry-i-kardigany.html" }, // Cynamonowy / Rdzawy
+  { sklep: "MANGO", nazwa: "Spodnie cygaretki z wysokim stanem", cena: "139,99 PLN", hex: "#556B2F", link: "https://shop.mango.com/pl/kobieta/spodnie_c49122393" }, // Oliwkowa zieleń
+
+  // BRIGHT / SPRING ITEMS
+  { sklep: "ZARA", nazwa: "Marynarka oversize strukturalna", cena: "349,00 PLN", hex: "#FF7F50", link: "https://www.zara.com/pl/pl/woman-blazers-l1054.html" }, // Żywy koral
+  { sklep: "MANGO", nazwa: "Top jedwabny na ramiączkach", cena: "199,99 PLN", hex: "#FFD700", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" }, // Słoneczny złoty
+  { sklep: "H&M", nazwa: "Gładka szmizjerka wiązana", cena: "149,00 PLN", hex: "#00FF7F", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/sukienki.html" }, // Jasna, żywa zieleń
+  { sklep: "ZARA", nazwa: "Spodnie z szerokimi nogawkami", cena: "149,00 PLN", hex: "#E6E6FA", link: "https://www.zara.com/pl/pl/woman-trousers-l1340.html" }, // Krokusowy fiolet / Lila
+
+  // MUTED / SUMMER ITEMS
+  { sklep: "H&M", nazwa: "Lniana koszula oversize", cena: "119,99 PLN", hex: "#C8A2C8", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/koszule-i-bluzki.html" }, // Przygaszona lawenda
+  { sklep: "MANGO", nazwa: "Sukienka dzianinowa dopasowana", cena: "169,99 PLN", hex: "#8FBC8F", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" }, // Zgaszona szałwia
+  { sklep: "ZARA", nazwa: "Sweter z dodatkiem kaszmiru", cena: "249,00 PLN", hex: "#B0C4DE", link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" }, // Gołębi błękit
+  { sklep: "H&M", nazwa: "Eleganckie szorty z zakładkami", cena: "99,00 PLN", hex: "#D3D3D3", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/szorty.html" }, // Kamienny szary
+  { sklep: "MANGO", nazwa: "Bluzka wiskozowa z dekoltem V", cena: "119,99 PLN", hex: "#FFC0CB", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" }, // Pudrowy róż
+];
 
 const dz = document.getElementById('drop-zone');
 const fi = document.getElementById('file-input');
@@ -287,8 +385,9 @@ async function analyzeImage() {
     clearInterval(msgInterval);
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('upload-section').style.display = 'block';
+    document.getElementById('upload-section').querySelectorAll('.error-box').forEach(e=>e.remove());
     document.getElementById('upload-section').insertAdjacentHTML('afterbegin',
-      `<div class="error-box">Nie udało się przeprowadzić analizy. Upewnij się, że zdjęcie zawiera wyraźną twarz w dobrym oświetleniu i spróbuj ponownie.<br><small style="opacity:0.6;font-size:11px">${err.message}</small></div>`);
+      `<div class="error-box">Nie udało się przeprowadzić analizy. Spróbuj ponownie.<br><small style="opacity:0.6;font-size:11px">${err.message}</small></div>`);
   }
 }
 
@@ -312,7 +411,8 @@ function displayResults(r) {
 
   const bestEl = document.getElementById('best-colors');
   bestEl.innerHTML = '';
-  (r.best_colors || []).forEach((hex, i) => {
+  const userGoodColors = r.best_colors || [];
+  userGoodColors.forEach((hex, i) => {
     bestEl.innerHTML += `<div class="color-swatch">
       <div class="swatch-circle" style="background:${hex}" title="${hex}"></div>
       <span class="swatch-name">${(r.best_colors_names||[])[i]||''}</span>
@@ -338,8 +438,67 @@ function displayResults(r) {
     celebEl.innerHTML += `<span class="celeb-chip">${c}</span>`;
   });
 
+  // URUCHOMIENIE DOPASOWANIA SZAFY KAPSUŁOWEJ WG MATEMATYKI KOLORÓW HEX
+  matchCapsuleWardrobe(userGoodColors);
+
   document.getElementById('results-screen').style.display = 'block';
   document.getElementById('results-screen').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// FUNKCJA OBLICZAJĄCA DYSTANS KOLORÓW (RGB EUCLIDEAN DISTANCE)
+function hexToRgb(hex) {
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  const fullHex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+function colorDistance(hex1, hex2) {
+  const r1 = hexToRgb(hex1);
+  const r2 = hexToRgb(hex2);
+  if (!r1 || !r2) return 999992;
+  return Math.sqrt(Math.pow(r1.r - r2.r, 2) + Math.pow(r1.g - r2.g, 2) + Math.pow(r1.b - r2.b, 2));
+}
+
+function matchCapsuleWardrobe(goodColors) {
+  const container = document.getElementById('capsule-container');
+  container.innerHTML = '';
+  if (goodColors.length === 0) return;
+
+  // Obliczamy najmniejszy dystans dla każdego ciucha do dowolnego koloru z palety użytkownika
+  const ratedItems = szafaKapsulowa.map(item => {
+    let minScore = 999999;
+    goodColors.forEach(userColor => {
+      const score = colorDistance(item.hex, userColor);
+      if (score < minScore) minScore = score;
+    });
+    return { ...item, score: minScore };
+  });
+
+  // Sortujemy od najlepiej pasujących (najniższy dystans) i bierzemy top 6
+  ratedItems.sort((a, b) => a.score - b.score);
+  const topMatches = ratedItems.slice(0, 6);
+
+  // Renderowanie kafelków ubrań
+  topMatches.forEach(item => {
+    container.innerHTML += `
+      <a href="${item.link}" target="_blank" class="shop-card">
+        <div>
+          <div class="shop-img-fallback" style="background-color: ${item.hex}; box-shadow: inset 0 0 20px rgba(0,0,0,0.15)">
+            <span>${item.sklep}</span>
+            <small style="opacity:0.8; font-weight:normal; font-size:9px; margin-top:5px;">KLIKNIJ I ZOBACZ</small>
+          </div>
+          <div class="shop-brand">${item.sklep}</div>
+          <div class="shop-name">${item.nazwa}</div>
+        </div>
+        <div class="shop-price">${item.cena}</div>
+      </a>
+    `;
+  });
 }
 
 function resetAll() {
@@ -353,7 +512,6 @@ function resetAll() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// WYBIEGOWA FUNKCJA PDF — POBIERA CAŁOŚĆ BEZ UCINANIA
 function generatePDF() {
   const element = document.getElementById('pdf-capture-area');
   const seasonName = document.getElementById('season-name').textContent;
@@ -362,13 +520,7 @@ function generatePDF() {
     margin:       [10, 10, 10, 10],
     filename:     `Raport_Analizy_${seasonName.replace(/\s+/g, '_')}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { 
-      scale: 2, 
-      useCORS: true, 
-      backgroundColor: '#FAF7F2',
-      scrollY: 0, // Reset pozycji scrolla naprawia ucinanie zawartości
-      scrollX: 0
-    },
+    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#FAF7F2', scrollY: 0, scrollX: 0 },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
   };
