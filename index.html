@@ -1,329 +1,515 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --cream:#FAF7F2;--gold:#C9A96E;--gold-light:#E8D5B0;--gold-dark:#8B6914;
-  --text-dark:#1A1209;--text-mid:#5C4A2A;--text-light:#9A8060;
-  --border:#E8D9C0;--white:#FFFFFF;
-}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;overflow-x:hidden}
-.serif{font-family:'Cormorant Garamond',serif}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colour Season Analyst - Beauty Intelligence</title>
+    <!-- Biblioteka do pobierania PDF bezpośrednio w przeglądarce -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --accent-color: #bfa37a;
+            --bg-color: #fcfbfa;
+            --card-bg: #f3f0ec;
+            --text-main: #2c2c2c;
+            --text-muted: #7f8c8d;
+            --border-color: #dcd7cf;
+        }
 
-/* HEADER */
-.header{text-align:center;padding:3rem 2rem 2rem;position:relative}
-.header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.subtitle{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--text-light);margin-bottom:1rem}
-.title{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:300;line-height:1.1;color:var(--text-dark);font-style:italic}
-.title span{font-style:normal;color:var(--gold-dark)}
-.tagline{font-size:14px;color:var(--text-mid);margin-top:1rem;font-weight:300;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6}
+        body {
+            font-family: 'Playfair Display', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-/* UPLOAD ZONE */
-.upload-section{max-width:560px;margin:0 auto;padding:0 2rem 2rem}
-.drop-zone{border:1px solid var(--border);border-radius:2px;padding:3rem 2rem;text-align:center;cursor:pointer;transition:all 0.3s ease;position:relative;background:var(--white);overflow:hidden}
-.drop-zone::before{content:'';position:absolute;inset:6px;border:1px dashed var(--gold-light);border-radius:1px;pointer-events:none}
-.drop-zone:hover{border-color:var(--gold);background:rgba(201,169,110,0.03)}
-.drop-zone.dragover{border-color:var(--gold);background:rgba(201,169,110,0.07)}
-.drop-icon{font-size:2.5rem;margin-bottom:1rem;opacity:0.4;color:var(--gold-dark)}
-.drop-title{font-size:1.2rem;font-weight:300;font-style:italic;font-family:'Cormorant Garamond',serif;color:var(--text-mid);margin-bottom:0.5rem}
-.drop-sub{font-size:12px;color:var(--text-light);letter-spacing:1px}
-#file-input{display:none}
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
 
-/* PREVIEW */
-.preview-box{display:none;text-align:center;margin-top:1.5rem}
-.preview-img{width:180px;height:180px;object-fit:cover;border-radius:50%;border:3px solid var(--gold-light);box-shadow:0 0 0 6px rgba(201,169,110,0.1)}
-.preview-name{font-size:12px;color:var(--text-light);margin-top:0.75rem;letter-spacing:1px}
-.btn-analyze{display:block;width:100%;margin-top:1.5rem;padding:1rem;background:var(--text-dark);color:var(--gold-light);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s;position:relative;overflow:hidden}
-.btn-analyze:hover{background:var(--gold-dark)}
-.btn-analyze:disabled{opacity:0.5;cursor:not-allowed}
-.btn-reset{display:block;width:100%;margin-top:0.75rem;padding:0.6rem;background:transparent;color:var(--text-light);border:1px solid var(--border);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;transition:all 0.3s}
-.btn-reset:hover{border-color:var(--text-light);color:var(--text-mid)}
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-/* LOADING */
-.loading-screen{display:none;text-align:center;padding:4rem 2rem;max-width:560px;margin:0 auto}
-.loader-ring{width:80px;height:80px;margin:0 auto 2rem;position:relative}
-.loader-ring::before,.loader-ring::after{content:'';position:absolute;inset:0;border-radius:50%;border:1px solid transparent}
-.loader-ring::before{border-top-color:var(--gold);animation:spin 1.2s linear infinite}
-.loader-ring::after{border-bottom-color:var(--gold-light);animation:spin 2s linear infinite reverse;inset:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-diamond{width:20px;height:20px;background:var(--gold);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);animation:pulse 1.2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:0.5;transform:translate(-50%,-50%) rotate(45deg) scale(0.8)}50%{opacity:1;transform:translate(-50%,-50%) rotate(45deg) scale(1)}}
-.loading-text{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-style:italic;color:var(--text-mid);margin-bottom:0.5rem}
-.loading-sub{font-size:12px;color:var(--text-light);letter-spacing:2px;text-transform:uppercase}
+        header .subtitle {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
 
-/* RESULTS */
-.results-screen{display:none;max-width:680px;margin:0 auto;padding:0 1.5rem 4rem;animation:fadeUp 0.6s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        header h1 {
+            font-size: 42px;
+            margin: 0 0 10px 0;
+            font-weight: 300;
+        }
 
-.season-hero{background:var(--white);border:1px solid var(--border);padding:2.5rem;text-align:center;position:relative;margin-bottom:1.5rem}
-.season-hero::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40px;height:2px;background:var(--gold)}
-.season-badge{display:inline-block;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold-dark);background:rgba(201,169,110,0.1);padding:6px 16px;margin-bottom:1.5rem;border:1px solid var(--gold-light)}
-.season-name{font-size:clamp(2rem,6vw,3.2rem);font-weight:300;font-style:italic;line-height:1;margin-bottom:0.5rem}
-.season-conf{font-size:12px;color:var(--text-light);letter-spacing:2px;margin-bottom:1.5rem;text-transform:uppercase}
-.conf-bar{height:2px;background:var(--border);max-width:200px;margin:8px auto 0;border-radius:2px;overflow:hidden}
-.conf-fill{height:100%;background:var(--gold);transition:width 1s ease}
-.season-desc{font-size:15px;color:var(--text-mid);line-height:1.8;max-width:480px;margin:0 auto;font-weight:300}
+        header .description {
+            font-size: 14px;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
 
-/* TRAITS */
-.traits-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:1.5rem}
-.trait-cell{background:var(--white);padding:1.25rem;text-align:center}
-.trait-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:0.4rem}
-.trait-value{font-size:1.1rem;font-weight:500;color:var(--text-dark)}
+        .upload-section {
+            background: #ffffff;
+            border: 1px dashed #d1cac0;
+            border-radius: 4px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-/* COLOR PALETTES */
-.palette-section{background:var(--white);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem}
-.section-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-light);margin-bottom:1.5rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)}
-.colors-row{display:flex;gap:10px;flex-wrap:wrap}
-.color-swatch{text-align:center;flex:1;min-width:60px}
-.swatch-circle{width:52px;height:52px;border-radius:50%;margin:0 auto 8px;border:1px solid rgba(0,0,0,0.08);transition:transform 0.2s}
-.swatch-circle:hover{transform:scale(1.1)}
-.swatch-name{font-size:10px;color:var(--text-light);line-height:1.3}
-.avoid-row .swatch-circle{position:relative}
-.avoid-row .swatch-circle::after{content:'×';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.4rem;color:rgba(255,255,255,0.9);font-weight:300}
+        .upload-section:hover {
+            border-color: var(--accent-color);
+        }
 
-/* TIPS */
-.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
-.tip-card{background:var(--white);border:1px solid var(--border);padding:1.5rem}
-.tip-icon{font-size:1.4rem;margin-bottom:0.75rem}
-.tip-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:0.75rem}
-.tip-text{font-size:13px;color:var(--text-mid);line-height:1.7;font-weight:300}
+        #image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 15px;
+            border-radius: 4px;
+            display: none;
+        }
 
-/* CELEBRITIES */
-.celeb-section{background:var(--white);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem}
-.celeb-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem}
-.celeb-chip{font-size:12px;padding:6px 14px;border:1px solid var(--border);color:var(--text-mid);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px}
+        .btn {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-family: inherit;
+        }
 
-/* ERROR */
-.error-box{background:#FFF8F8;border:1px solid #F5C1C1;padding:1.5rem;text-align:center;margin:1.5rem 0;color:#993535;font-size:14px;border-radius:2px}
+        .btn:hover {
+            background: #34495e;
+        }
 
-.btn-again{display:block;width:100%;padding:1rem;background:transparent;color:var(--text-dark);border:1px solid var(--text-dark);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s;margin-top:2rem}
-.btn-again:hover{background:var(--text-dark);color:var(--gold-light)}
+        /* Przycisk Pobierz PDF dopasowany do stylu Premium */
+        .btn-pdf {
+            background: #ffffff;
+            color: #2c3e50;
+            border: 1px solid #2c3e50;
+            margin-top: 30px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
 
-/* SEASON COLOR THEMES */
-.spring{--season-accent:#E8A87C;--season-bg:rgba(232,168,124,0.08)}
-.summer{--season-accent:#9BB7D4;--season-bg:rgba(155,183,212,0.08)}
-.autumn{--season-accent:#C17B3F;--season-bg:rgba(193,123,63,0.08)}
-.winter{--season-accent:#6B7FA3;--season-bg:rgba(107,127,163,0.08)}
+        .btn-pdf:hover {
+            background: #2c3e50;
+            color: white;
+        }
 
-.season-hero.spring,.season-hero.summer,.season-hero.autumn,.season-hero.winter{background:var(--season-bg,var(--white))}
-.season-hero.spring::after,.season-hero.summer::after,.season-hero.autumn::after,.season-hero.winter::after{background:var(--season-accent,var(--gold))}
-</style>
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 40px;
+        }
+
+        /* Kontener do druku PDF */
+        #pdf-content-wrapper {
+            padding: 15px;
+            background: var(--bg-color);
+        }
+
+        .main-result-box {
+            background: var(--card-bg);
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .main-result-box .title {
+            background: #e5dfd7;
+            padding: 4px 12px;
+            display: inline-block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .main-result-box h2 {
+            font-size: 48px;
+            margin: 0 0 15px 0;
+            font-weight: 400;
+        }
+
+        .main-result-box .confidence {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            display: inline-block;
+            padding-top: 10px;
+            margin-bottom: 20px;
+            width: 40%;
+        }
+
+        .main-result-box .description-text {
+            font-size: 15px;
+            line-height: 1.7;
+            max-width: 650px;
+            margin: 0 auto;
+            color: #4a4a4a;
+        }
+
+        .grid-kfe {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+
+        .meta-card {
+            background: #ffffff;
+            padding: 25px 10px;
+            text-align: center;
+        }
+
+        .meta-card .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .meta-card .val {
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin: 40px 0 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        /* Palety kolorów (Koła) */
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-bottom: 40px;
+            padding: 10px 0;
+        }
+
+        .color-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+        }
+
+        .color-swatch {
+            height: 70px;
+            width: 70px;
+            border-radius: 50%;
+            margin-bottom: 12px;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .color-name {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* Trzy główne kafelki porad */
+        .advice-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 768px) {
+            .advice-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .advice-card {
+            background: #ffffff;
+            border: 1px solid #eeeae5;
+            padding: 30px 20px;
+            border-radius: 2px;
+        }
+
+        .advice-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        .advice-card p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #444;
+            margin: 0;
+        }
+
+        .celeb-list {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .celeb-tag {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            font-size: 13px;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
 
-<div class="header">
-  <p class="subtitle">Beauty Intelligence</p>
-  <h1 class="serif title">Colour<br><span>Season</span> Analyst</h1>
-  <p class="tagline">Odkryj swoją paletę urody. Sztuczna inteligencja analizuje odcień skóry, kontrast i kolorystykę, by określić Twoją porę roku.</p>
-</div>
+    <div class="container">
+        <header>
+            <div class="subtitle">Beauty Intelligence</div>
+            <h1>Colour Season <span>Analyst</span></h1>
+            <div class="description">
+                Odkryj swoją paletę urody. Sztuczna inteligencja analizuje odcień skóry, kontrast i kolorystykę, by określić Twoją porę roku.
+            </div>
+        </header>
 
-<div class="upload-section" id="upload-section">
-  <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-    <div class="drop-icon">◈</div>
-    <p class="drop-title serif">Prześlij portret</p>
-    <p class="drop-sub">JPG · PNG · WEBP &nbsp;·&nbsp; Przeciągnij lub kliknij</p>
-  </div>
-  <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp">
+        <div class="upload-section" onclick="document.getElementById('file-input').click()">
+            <div style="font-size: 24px; margin-bottom: 10px; color: var(--accent-color);">✦</div>
+            <div style="font-size: 14px; font-weight: bold;">Wgraj zdjęcie</div>
+            <input type="file" id="file-input" accept="image/*" style="display: none" onchange="previewImage(event)">
+            <img id="image-preview" alt="Podgląd">
+        </div>
 
-  <div class="preview-box" id="preview-box">
-    <img id="preview-img" class="preview-img" src="" alt="Podgląd">
-    <p class="preview-name" id="preview-name">PLIK WCZYTANY</p>
-    <button class="btn-analyze" id="btn-analyze" onclick="analyzeImage()">Analizuj moją porę roku</button>
-    <button class="btn-reset" onclick="resetAll()">Wybierz inne zdjęcie</button>
-  </div>
-</div>
+        <button class="btn" id="analyze-btn" onclick="analyzeImage()">Analizuj moją porę roku</button>
 
-<div class="loading-screen" id="loading-screen">
-  <div class="loader-ring">
-    <div class="loader-diamond"></div>
-  </div>
-  <p class="loading-text serif">Analizuję Twoje kolory…</p>
-  <p class="loading-sub" id="loading-msg">Badanie odcienia skóry</p>
-</div>
+        <div class="loader" id="loader">Trwa analiza kolorystyczna przez AI...</div>
 
-<div class="results-screen" id="results-screen">
-  <div id="season-hero" class="season-hero">
-    <div id="season-badge" class="season-badge">Twoja pora roku</div>
-    <h2 class="serif season-name" id="season-name">—</h2>
-    <p class="season-conf" id="season-conf">Pewność analizy</p>
-    <div class="conf-bar"><div class="conf-fill" id="conf-fill" style="width:0%"></div></div>
-    <p class="season-desc" id="season-desc" style="margin-top:1.5rem"></p>
-  </div>
+        <!-- Główna sekcja wyników -->
+        <div class="results-section">
+            
+            <!-- Wszystko wewnątrz tego diva zostanie wydrukowane do PDF -->
+            <div id="pdf-content-wrapper">
+                <div class="main-result-box">
+                    <div class="title">Twoja Pora Roku</div>
+                    <h2 id="res-season">—</h2>
+                    <div class="confidence" id="res-confidence">Pewność analizy · 0%</div>
+                    <div class="description-text" id="res-description">—</div>
+                </div>
 
-  <div class="traits-grid">
-    <div class="trait-cell"><p class="trait-label">Podton skóry</p><p class="trait-value" id="trait-undertone">—</p></div>
-    <div class="trait-cell"><p class="trait-label">Kontrast</p><p class="trait-value" id="trait-contrast">—</p></div>
-    <div class="trait-cell"><p class="trait-label">Nasycenie</p><p class="trait-value" id="trait-saturation">—</p></div>
-    <div class="trait-cell"><p class="trait-label">Pigmentacja</p><p class="trait-value" id="trait-skin">—</p></div>
-  </div>
+                <div class="grid-kfe">
+                    <div class="meta-card">
+                        <div class="label">Podton skóry</div>
+                        <div class="val" id="res-undertone">—</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="label">Kontrast</div>
+                        <div class="val" id="res-contrast">—</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="label">Nasycenie</div>
+                        <div class="val" id="res-saturation">—</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="label">Pigmentacja</div>
+                        <div class="val" id="res-skin">—</div>
+                    </div>
+                </div>
 
-  <div class="palette-section">
-    <p class="section-label">Twoje kolory — noś je śmiało</p>
-    <div class="colors-row" id="best-colors"></div>
-    <p class="section-label" style="margin-top:1.5rem">Kolory do unikania</p>
-    <div class="colors-row avoid-row" id="avoid-colors"></div>
-  </div>
+                <div class="section-title">Twoje kolory — noś je śmiało</div>
+                <div class="color-palette" id="palette-good"></div>
 
-  <div class="tips-grid">
-    <div class="tip-card"><p class="tip-icon">💄</p><p class="tip-title">Makijaż</p><p class="tip-text" id="tip-makeup">—</p></div>
-    <div class="tip-card"><p class="tip-icon">💇</p><p class="tip-title">Włosy</p><p class="tip-text" id="tip-hair">—</p></div>
-    <div class="tip-card"><p class="tip-icon">👗</p><p class="tip-title">Stylizacja</p><p class="tip-text" id="tip-style">—</p></div>
-  </div>
+                <div class="section-title">Kolory do unikania</div>
+                <div class="color-palette" id="palette-bad"></div>
 
-  <div class="celeb-section">
-    <p class="section-label">Znane osoby z Twoją porą roku</p>
-    <div class="celeb-chips" id="celeb-chips"></div>
-  </div>
+                <div class="advice-grid">
+                    <div class="advice-card">
+                        <h3>💄 Makijaż</h3>
+                        <p id="tip-makeup">—</p>
+                    </div>
+                    <div class="advice-card">
+                        <h3>👩‍🎨 Włosy</h3>
+                        <p id="tip-hair">—</p>
+                    </div>
+                    <div class="advice-card">
+                        <h3>👗 Stylizacja</h3>
+                        <p id="tip-style">—</p>
+                    </div>
+                </div>
 
-  <button class="btn-again" onclick="resetAll()">Analizuj nowe zdjęcie</button>
-</div>
+                <div class="section-title">Znane osoby z Twoją porą roku</div>
+                <div class="celeb-list" id="celeb-container"></div>
+            </div>
 
-<script>
-let imageBase64 = null;
-let imageType = 'image/jpeg';
+            <!-- Przycisk generowania PDF (ukryty przed wydrukiem) -->
+            <button class="btn btn-pdf" id="download-pdf-btn" onclick="generatePDF()">📥 Pobierz mój raport (PDF)</button>
+        </div>
+    </div>
 
-const dz = document.getElementById('drop-zone');
-const fi = document.getElementById('file-input');
+    <script>
+        const n8nWebhookUrl = 'https://marzi91.app.n8n.cloud/webhook/analiza-kolorystyczna';
+        let base64ImageData = '';
 
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('dragover');
-  const f = e.dataTransfer.files[0];
-  if(f) handleFile(f);
-});
-fi.addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); });
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-function handleFile(file) {
-  if(!['image/jpeg','image/png','image/webp'].includes(file.type)) {
-    alert('Proszę wgrać plik JPG, PNG lub WEBP.'); return;
-  }
-  imageType = file.type;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    imageBase64 = ev.target.result.split(',')[1];
-    document.getElementById('preview-img').src = ev.target.result;
-    document.getElementById('preview-name').textContent = file.name.toUpperCase();
-    document.getElementById('preview-box').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('image-preview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                base64ImageData = e.target.result.split(',')[1];
+            }
+            reader.readAsDataURL(file);
+        }
 
-const loadingMsgs = [
-  'Badanie odcienia skóry…',
-  'Analiza kontrastu urody…',
-  'Określanie podtonu…',
-  'Dopasowywanie pory roku…',
-  'Komponowanie palety…'
-];
-let msgIdx = 0; let msgInterval;
+        async function analyzeImage() {
+            if (!base64ImageData) {
+                alert('Proszę najpierw wgrać zdjęcie.');
+                return;
+            }
 
-async function analyzeImage() {
-  if(!imageBase64) return;
-  document.getElementById('upload-section').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'block';
-  document.getElementById('results-screen').style.display = 'none';
+            const btn = document.getElementById('analyze-btn');
+            const loader = document.getElementById('loader');
+            const resultsSection = document.querySelector('.results-section');
 
-  msgIdx = 0;
-  document.getElementById('loading-msg').textContent = loadingMsgs[0];
-  msgInterval = setInterval(() => {
-    msgIdx = (msgIdx + 1) % loadingMsgs.length;
-    document.getElementById('loading-msg').textContent = loadingMsgs[msgIdx];
-  }, 1800);
+            btn.style.display = 'none';
+            loader.style.display = 'block';
+            resultsSection.style.display = 'none';
 
-  // Wklej w poniższe pole swój "Test URL" z n8n:
-  const n8nWebhookUrl = 'https://marzi91.app.n8n.cloud/webhook/analiza-kolorystyczna';
+            try {
+                const response = await fetch(n8nWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64ImageData })
+                });
 
-  try {
-    const response = await fetch(n8nWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image: imageBase64,
-        media_type: imageType
-      })
-    });
+                if (!response.ok) throw new Error('Błąd serwera.');
 
-    clearInterval(msgInterval);
-    if (!response.ok) {
-      throw new Error(`Błąd n8n (${response.status})`);
-    }
+                const data = await response.json();
+                renderResults(data);
+                
+                loader.style.display = 'none';
+                btn.style.display = 'block';
+                resultsSection.style.display = 'block';
 
-    const result = await response.json();
-    displayResults(result);
+            } catch (error) {
+                alert('Wystąpił błąd: ' + error.message);
+                loader.style.display = 'none';
+                btn.style.display = 'block';
+            }
+        }
 
-  } catch(err) {
-    clearInterval(msgInterval);
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('upload-section').style.display = 'block';
-    document.getElementById('upload-section').insertAdjacentHTML('afterbegin',
-      `<div class="error-box">Nie udało się przeprowadzić analizy. Upewnij się, że zdjęcie zawiera wyraźną twarz w dobrym oświetleniu i spróbuj ponownie.<br><small style="opacity:0.6;font-size:11px">${err.message}</small></div>`);
-  }
-}
+        function renderResults(data) {
+            document.getElementById('res-season').innerText = data.season || '—';
+            document.getElementById('res-confidence').innerText = `Pewność analizy · ${data.confidence || 0}%`;
+            document.getElementById('res-description').innerText = data.description || '—';
+            document.getElementById('res-undertone').innerText = data.undertone || '—';
+            document.getElementById('res-contrast').innerText = data.contrast || '—';
+            document.getElementById('res-saturation').innerText = data.saturation || '—';
+            document.getElementById('res-skin').innerText = data.skin || '—';
 
-function displayResults(r) {
-  document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('tip-makeup').innerText = data.makeup_advice || '—';
+            document.getElementById('tip-hair').innerText = data.hair_advice || '—';
+            document.getElementById('tip-style').innerText = data.style_advice || '—';
 
-  const cat = r.season_category || '';
-  const seasonClass = cat.includes('Wiosna') ? 'spring' : cat.includes('Lato') ? 'summer' : cat.includes('Jesień') ? 'autumn' : 'winter';
-  const hero = document.getElementById('season-hero');
-  hero.className = 'season-hero ' + seasonClass;
+            // Dobre kolory (okrągłe kafelki)
+            const goodContainer = document.getElementById('palette-good');
+            goodContainer.innerHTML = '';
+            if (data.best_colors && data.best_colors_names) {
+                data.best_colors.forEach((color, index) => {
+                    const name = data.best_colors_names[index] || '';
+                    goodContainer.innerHTML += `
+                        <div class="color-item">
+                            <div class="color-swatch" style="background-color: ${color}"></div>
+                            <div class="color-name">${name}</div>
+                        </div>`;
+                });
+            }
 
-  document.getElementById('season-name').textContent = r.season || '—';
-  document.getElementById('season-conf').textContent = `Pewność analizy · ${r.confidence || 0}%`;
-  document.getElementById('conf-fill').style.width = (r.confidence || 0) + '%';
-  document.getElementById('season-desc').textContent = r.description || '';
+            // Kolory do unikania (okrągłe kafelki z krzyżykiem '×')
+            const badContainer = document.getElementById('palette-bad');
+            badContainer.innerHTML = '';
+            if (data.worst_colors && data.worst_colors_names) {
+                data.worst_colors.forEach((color, index) => {
+                    const name = data.worst_colors_names[index] || '';
+                    badContainer.innerHTML += `
+                        <div class="color-item">
+                            <div class="color-swatch" style="background-color: ${color}">×</div>
+                            <div class="color-name">${name}</div>
+                        </div>`;
+                });
+            }
 
-  document.getElementById('trait-undertone').textContent = r.undertone || '—';
-  document.getElementById('trait-contrast').textContent = r.contrast || '—';
-  document.getElementById('trait-saturation').textContent = r.saturation || '—';
-  document.getElementById('trait-skin').textContent = (r.skin || '—').charAt(0).toUpperCase() + (r.skin||'').slice(1);
+            // Znane osoby
+            const celebContainer = document.getElementById('celeb-container');
+            celebContainer.innerHTML = '';
+            if (data.celebrities) {
+                data.celebrities.forEach(celeb => {
+                    celebContainer.innerHTML += `<div class="celeb-tag">${celeb}</div>`;
+                });
+            }
+        }
 
-  const bestEl = document.getElementById('best-colors');
-  bestEl.innerHTML = '';
-  (r.best_colors || []).forEach((hex, i) => {
-    bestEl.innerHTML += `<div class="color-swatch">
-      <div class="swatch-circle" style="background:${hex}" title="${hex}"></div>
-      <span class="swatch-name">${(r.best_colors_names||[])[i]||''}</span>
-    </div>`;
-  });
+        // Dedykowana funkcja generująca raport PDF
+        function generatePDF() {
+            const element = document.getElementById('pdf-content-wrapper');
+            const seasonName = document.getElementById('res-season').innerText;
+            
+            const opt = {
+                margin:       [12, 12, 12, 12],
+                filename:     `Raport_Kolorystyczny_${seasonName.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
 
-  const avoidEl = document.getElementById('avoid-colors');
-  avoidEl.innerHTML = '';
-  (r.avoid_colors || []).forEach((hex, i) => {
-    avoidEl.innerHTML += `<div class="color-swatch">
-      <div class="swatch-circle" style="background:${hex}" title="${hex}"></div>
-      <span class="swatch-name">${(r.avoid_colors_names||[])[i]||''}</span>
-    </div>`;
-  });
-
-  document.getElementById('tip-makeup').textContent = r.makeup || '—';
-  document.getElementById('tip-hair').textContent = r.hair || '—';
-  document.getElementById('tip-style').textContent = r.style || '—';
-
-  const celebEl = document.getElementById('celeb-chips');
-  celebEl.innerHTML = '';
-  (r.celebrities || []).forEach(c => {
-    celebEl.innerHTML += `<span class="celeb-chip">${c}</span>`;
-  });
-
-  document.getElementById('results-screen').style.display = 'block';
-  document.getElementById('results-screen').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function resetAll() {
-  imageBase64 = null;
-  document.getElementById('upload-section').style.display = 'block';
-  document.getElementById('upload-section').querySelectorAll('.error-box').forEach(e=>e.remove());
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('results-screen').style.display = 'none';
-  document.getElementById('preview-box').style.display = 'none';
-  document.getElementById('file-input').value = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-</script>
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
 </body>
 </html>
