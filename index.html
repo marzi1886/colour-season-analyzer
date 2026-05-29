@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Biblioteka do generowania PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -87,80 +88,36 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 .avoid-row .swatch-circle{position:relative}
 .avoid-row .swatch-circle::after{content:'×';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.4rem;color:rgba(255,255,255,0.9);font-weight:300}
 
-/* REKOMENDACJE PRODUKTOWE PREMUM */
-.shop-grid {
+/* MOZAIKA INSPIRACJI PINTEREST (MVP) */
+.inspire-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 15px;
   margin-top: 1rem;
 }
 @media (min-width: 480px) {
-  .shop-grid { grid-template-columns: repeat(3, 1fr); }
+  .inspire-grid { grid-template-columns: repeat(3, 1fr); }
 }
-.shop-card {
+.inspire-card {
   background: var(--white);
   border: 1px solid var(--border);
-  padding: 12px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.shop-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 15px rgba(201,169,110,0.15);
-}
-.shop-img-container {
-  width: 100%;
-  height: 180px;
+  padding: 6px;
   overflow: hidden;
-  margin-bottom: 10px;
-  position: relative;
-  border-radius: 1px;
-  background: #f8f6f3;
+  border-radius: 2px;
 }
-.shop-img {
+.inspire-img-box {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+.inspire-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.4s ease;
 }
-.shop-card:hover .shop-img {
-  transform: scale(1.05);
-}
-.shop-color-indicator {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.9);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-}
-.shop-brand {
-  font-size: 9px;
-  letter-spacing: 1px;
-  color: var(--text-light);
-  text-transform: uppercase;
-  margin-bottom: 3px;
-}
-.shop-name {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-dark);
-  line-height: 1.3;
-  margin-bottom: 6px;
-  height: 32px;
-  overflow: hidden;
-}
-.shop-price {
-  font-size: 11px;
-  font-weight: bold;
-  color: var(--gold-dark);
+.inspire-card:hover .inspire-img {
+  transform: scale(1.04);
 }
 
 /* TIPS */
@@ -174,9 +131,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 .celeb-section{background:var(--white);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem}
 .celeb-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem}
 .celeb-chip{font-size:12px;padding:6px 14px;border:1px solid var(--border);color:var(--text-mid);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px}
-
-/* ERROR */
-.error-box{background:#FFF8F8;border:1px solid #F5C1C1;padding:1.5rem;text-align:center;margin:1.5rem 0;color:#993535;font-size:14px;border-radius:2px}
 
 /* BUTTONS */
 .btn-pdf {
@@ -281,9 +235,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
       <div class="celeb-chips" id="celeb-chips"></div>
     </div>
 
+    <!-- CZYSTA MOZAIKA INSPIRACJI WIZUALNYCH (MVP) -->
     <div class="palette-section" id="capsule-section">
-      <p class="section-label">Twoja Szafa Kapsułowa — Inspiracje Produktowe</p>
-      <div class="shop-grid" id="capsule-container"></div>
+      <p class="section-label">Twoje Inspiracje Stylizacyjne</p>
+      <div class="inspire-grid" id="capsule-container"></div>
     </div>
   </div>
 
@@ -295,32 +250,41 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 let imageBase64 = null;
 let imageType = 'image/jpeg';
 
-// BEZBŁĘDNA BAZA STUDYJNYCH ZDJĘĆ PRODUKTOWYCH (WYSELEKCJONOWANA I ZWERYFIKOWANA)
-const szafaKapsulowa = [
-  // CHŁODNE / ZIMOWE / LETNIE ODCIENIE (COOL, DEEP, LIGHT MULTI)
-  { sklep: "ZARA", nazwa: "Koszula z satyny premium", cena: "139,00 PLN", hex: "#0047AB", foto: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=400&q=80", link: "https://www.zara.com/pl/pl/woman-shirts-l1217.html" },
-  { sklep: "H&M", nazwa: "Marynarka z domieszką wełny", cena: "299,00 PLN", hex: "#1A1A1A", foto: "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=400&q=80", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/marynarki-i-kamizelki.html" },
-  { sklep: "MANGO", nazwa: "Sukienka koktajlowa fuksja", cena: "249,99 PLN", hex: "#FF007F", foto: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=400&q=80", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" },
-  { sklep: "ZARA", nazwa: "Klasyczny golf z dzianiny", cena: "99,90 PLN", hex: "#FFFFFF", foto: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=400&q=80" , link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" },
-  { sklep: "H&M", nazwa: "Satynowa spódnica midi", cena: "129,99 PLN", hex: "#4A6B82", foto: "https://images.unsplash.com/photo-1583496661160-fb48862c4a4e?auto=format&fit=crop&w=400&q=80", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/spodnice.html" },
-
-  // CIEPŁE / JESIENNE ODCIENIE (WARM, MUTED, DEEP)
-  { sklep: "MANGO", nazwa: "Dwurzędowy trencz klasyczny", cena: "399,99 PLN", hex: "#C29B68", foto: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=400&q=80", link: "https://shop.mango.com/pl/kobieta/kurtki-i-p%C5%82aszcze_c12658822" },
-  { sklep: "ZARA", nazwa: "Skórzana spódnica ołówkowa", cena: "299,00 PLN", hex: "#8B4513", foto: "https://images.unsplash.com/photo-1605733513597-a8f8d410f163?auto=format&fit=crop&w=400&q=80", link: "https://www.zara.com/pl/pl/woman-skirts-l1296.html" },
-  { sklep: "H&M", nazwa: "Kardigan z grubym splotem", cena: "149,99 PLN", hex: "#D2691E", foto: "https://images.unsplash.com/photo-1614975058789-41316d0e2e9c?auto=format&fit=crop&w=400&q=80", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/swetry-i-kardigany.html" },
-  { sklep: "MANGO", nazwa: "Spodnie cygaretki z stanem", cena: "139,99 PLN", hex: "#556B2F", foto: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=400&q=80", link: "https://shop.mango.com/pl/kobieta/spodnie_c49122393" },
-
-  // JASNE / WIOSENNE ODCIENIE (WARM, BRIGHT, LIGHT)
-  { sklep: "ZARA", nazwa: "Marynarka oversize struktura", cena: "349,00 PLN", hex: "#FF7F50", foto: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&w=400&q=80", link: "https://www.zara.com/pl/pl/woman-blazers-l1054.html" },
-  { sklep: "MANGO", nazwa: "Top jedwabny na ramiączkach", cena: "199,99 PLN", hex: "#FFD700", foto: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" },
-  { sklep: "H&M", nazwa: "Gładka szmizjerka wiązana", cena: "149,00 PLN", hex: "#00FF7F", foto: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=400&q=80", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/sukienki.html" },
-
-  // STONOWANE / PASELOCOWE ODCIENIE (LATO)
-  { sklep: "H&M", nazwa: "Lniana koszula oversize", cena: "119,99 PLN", hex: "#C8A2C8", foto: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=400&q=80", link: "https://www2.hm.com/pl_pl/ona/kupuj-wg-produktu/koszule-i-bluzki.html" },
-  { sklep: "MANGO", nazwa: "Sukienka dzianinowa midi", cena: "169,99 PLN", hex: "#8FBC8F", foto: "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=400&q=80", link: "https://shop.mango.com/pl/kobieta/sukienki_c18047913" },
-  { sklep: "ZARA", nazwa: "Sweter z dodatkiem kaszmiru", cena: "249,00 PLN", hex: "#B0C4DE", foto: "https://images.unsplash.com/photo-1574164904299-3a102b110380?auto=format&fit=crop&w=400&q=80", link: "https://www.zara.com/pl/pl/woman-knitwear-l1152.html" },
-  { sklep: "MANGO", nazwa: "Bluzka wiskozowa z dekoltem", cena: "119,99 PLN", hex: "#FFC0CB", foto: "https://images.unsplash.com/photo-1551799517-eb8f03cb5e6a?auto=format&fit=crop&w=400&q=80", link: "https://shop.mango.com/pl/kobieta/koszulki-i-topy_c40915609" }
-];
+// SZAFA STATYCZNA MVP: 6 WYSELEKCJONOWANYCH, LUKSUSOWYCH STYLIZACJI DAMSKICH DLA KAŻDEJ Z 4 GŁÓWNYCH PÓR ROKU
+const szafaPinterestMVP = {
+  winter: [
+    "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=400&q=80", // fuksja/czerń płaszcz look
+    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80", // elegancki neon/vibrant zimowy sweter
+    "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=400&q=80", // kobaltowa marynarka look
+    "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=400&q=80", // minimalistyczna czerń/biel premium
+    "https://images.unsplash.com/photo-1618244972963-dbee1a7edc95?auto=format&fit=crop&w=400&q=80", // głęboki burgund garnitur
+    "https://images.unsplash.com/photo-1611042553975-08733608b2db?auto=format&fit=crop&w=400&q=80"  // luksusowy zimowy biały outfit
+  ],
+  summer: [
+    "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=400&q=80", // pastelowa koszula zgaszony lila
+    "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=400&q=80", // miękka letnia szałwia sukienka
+    "https://images.unsplash.com/photo-1583496661160-fb48862c4a4e?auto=format&fit=crop&w=400&q=80", // gołębia spódnica midi jedwab
+    "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=400&q=80", // błękit paryski/szary garnitur
+    "https://images.unsplash.com/photo-1605497746444-ac9defd24545?auto=format&fit=crop&w=400&q=80", // pudrowy chłodny róż lniana stylizacja
+    "https://images.unsplash.com/photo-1574164904299-3a102b110380?auto=format&fit=crop&w=400&q=80"  // stonowany zgaszony błękit casual
+  ],
+  autumn: [
+    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=400&q=80", // klasyczny beżowy płaszcz camel look
+    "https://images.unsplash.com/photo-1605733513597-a8f8d410f163?auto=format&fit=crop&w=400&q=80", // cynamonowa wełna zamsz
+    "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=400&q=80", // musztardowy jesienny sweter gruby splot
+    "https://images.unsplash.com/photo-1614975058789-41316d0e2e9c?auto=format&fit=crop&w=400&q=80", // rdzawa terakota zestaw sukienka
+    "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=400&q=80", // oliwka khaki spodnie w kant look
+    "https://images.unsplash.com/photo-1509319117193-57bab727e09d?auto=format&fit=crop&w=400&q=80"  // czekoladowy brąz głęboka jesień boho
+  ],
+  spring: [
+    "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&w=400&q=80", // jasny, ciepły koral żakiet marynarka
+    "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80", // słoneczny, świetlisty złoty top satyna
+    "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=400&q=80", // świeża, żywa zieleń wiosenna sukienka
+    "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=400&q=80", // jasna brzoskwinia, pastelowy look boho
+    "https://images.unsplash.com/photo-1551799517-eb8f03cb5e6a?auto=format&fit=crop&w=400&q=80", // ciepły miętowy garnitur premium
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80"  // turkusowy świetlisty outfit wiosenny
+  ]
+};
 
 const dz = document.getElementById('drop-zone');
 const fi = document.getElementById('file-input');
@@ -448,48 +412,27 @@ function displayResults(r) {
     celebEl.innerHTML = '<span class="celeb-chip" style="border:none">Brak danych</span>';
   }
 
-  matchCapsuleWardrobe(userGoodColors);
+  // MVP: ŁADOWANIE STAŁYCH 6 ZDJĘĆ Z PINTERESTA NA PODSTAWIE MAPOWANIA PORY ROKU
+  renderPinterestInspirations(seasonClass);
 
   document.getElementById('results-screen').style.display = 'block';
   document.getElementById('results-screen').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function hexToRgb(hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => r + r + g + g + b + b));
-  return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
-}
-
-function colorDistance(hex1, hex2) {
-  const r1 = hexToRgb(hex1), r2 = hexToRgb(hex2);
-  return (!r1 || !r2) ? 999 : Math.sqrt(Math.pow(r1.r - r2.r, 2) + Math.pow(r1.g - r2.g, 2) + Math.pow(r1.b - r2.b, 2));
-}
-
-function matchCapsuleWardrobe(goodColors) {
+function renderPinterestInspirations(seasonClass) {
   const container = document.getElementById('capsule-container');
   container.innerHTML = '';
-  if (goodColors.length === 0) return;
-
-  const ratedItems = szafaKapsulowa.map(item => {
-    let minScore = 999;
-    goodColors.forEach(uc => { const score = colorDistance(item.hex, uc); if (score < minScore) minScore = score; });
-    return { ...item, score: minScore };
-  });
-
-  ratedItems.sort((a, b) => a.score - b.score);
   
-  ratedItems.slice(0, 6).forEach(item => {
+  // Pobieramy sztywne 6 damskich stylizacji dla danej grupy
+  const images = szafaPinterestMVP[seasonClass] || szafaPinterestMVP['winter'];
+
+  images.forEach(url => {
     container.innerHTML += `
-      <a href="${item.link}" target="_blank" class="shop-card">
-        <div>
-          <div class="shop-img-container">
-            <img class="shop-img" src="${item.foto}" alt="${item.nazwa}">
-            <div class="shop-color-indicator" style="background-color: ${item.hex}"></div>
-          </div>
-          <div class="shop-brand">${item.sklep}</div>
-          <div class="shop-name">${item.nazwa}</div>
+      <div class="inspire-card">
+        <div class="inspire-img-box">
+          <img class="inspire-img" src="${url}" alt="Inspiracja stylizacji">
         </div>
-        <div class="shop-price">${item.cena}</div>
-      </a>`;
+      </div>`;
   });
 }
 
