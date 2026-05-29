@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- DODANO: Biblioteka do generowania PDF bezpośrednio w przeglądarce -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -101,7 +102,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 /* ERROR */
 .error-box{background:#FFF8F8;border:1px solid #F5C1C1;padding:1.5rem;text-align:center;margin:1.5rem 0;color:#993535;font-size:14px;border-radius:2px}
 
-/* DODANO: Przycisk Pobierz PDF dopasowany do Twojego stylu */
+/* PRZYCISKI AKCJI */
 .btn-pdf {
   display: block;
   width: 100%;
@@ -170,8 +171,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 
 <div class="results-screen" id="results-screen">
   
-  <!-- DODANO: Kontener owijający cały dotychczasowy raport (tylko to drukuje się do PDF) -->
-  <div id="pdf-capture-area" style="background: #FAF7F2; padding: 2px;">
+  <div id="pdf-capture-area" style="background: #FAF7F2; padding: 4px;">
     <div id="season-hero" class="season-hero">
       <div id="season-badge" class="season-badge">Twoja pora roku</div>
       <h2 class="serif season-name" id="season-name">—</h2>
@@ -206,7 +206,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
     </div>
   </div>
 
-  <!-- DODANO: Guzik do pobierania (poza strefą druku, by nie powielał się na dokumencie) -->
   <button class="btn-pdf" id="download-pdf-btn" onclick="generatePDF()">📥 Pobierz raport PDF</button>
   <button class="btn-again" onclick="resetAll()">Analizuj nowe zdjęcie</button>
 </div>
@@ -322,16 +321,16 @@ function displayResults(r) {
 
   const avoidEl = document.getElementById('avoid-colors');
   avoidEl.innerHTML = '';
-  (r.avoid_colors || []).forEach((hex, i) => {
+  (r.avoid_colors || r.worst_colors || []).forEach((hex, i) => {
     avoidEl.innerHTML += `<div class="color-swatch">
       <div class="swatch-circle" style="background:${hex}" title="${hex}"></div>
-      <span class="swatch-name">${(r.avoid_colors_names||[])[i]||''}</span>
+      <span class="swatch-name">${(r.avoid_colors_names || r.worst_colors_names || [])[i]||''}</span>
     </div>`;
   });
 
-  document.getElementById('tip-makeup').textContent = r.makeup || '—';
-  document.getElementById('tip-hair').textContent = r.hair || '—';
-  document.getElementById('tip-style').textContent = r.style || '—';
+  document.getElementById('tip-makeup').textContent = r.makeup || r.makeup_advice || '—';
+  document.getElementById('tip-hair').textContent = r.hair || r.hair_advice || '—';
+  document.getElementById('tip-style').textContent = r.style || r.style_advice || '—';
 
   const celebEl = document.getElementById('celeb-chips');
   celebEl.innerHTML = '';
@@ -354,7 +353,7 @@ function resetAll() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// DODANO: Funkcja do pobierania dokumentu w Twoich stałych kolorach
+// WYBIEGOWA FUNKCJA PDF — POBIERA CAŁOŚĆ BEZ UCINANIA
 function generatePDF() {
   const element = document.getElementById('pdf-capture-area');
   const seasonName = document.getElementById('season-name').textContent;
@@ -363,8 +362,15 @@ function generatePDF() {
     margin:       [10, 10, 10, 10],
     filename:     `Raport_Analizy_${seasonName.replace(/\s+/g, '_')}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#FAF7F2' }, // Wymuszamy zachowanie Twojego tła cream
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas:  { 
+      scale: 2, 
+      useCORS: true, 
+      backgroundColor: '#FAF7F2',
+      scrollY: 0, // Reset pozycji scrolla naprawia ucinanie zawartości
+      scrollX: 0
+    },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
   html2pdf().set(opt).from(element).save();
