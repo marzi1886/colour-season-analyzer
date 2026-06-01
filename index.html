@@ -76,7 +76,7 @@
             position: relative;
             cursor: pointer;
             overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: background-color 0.4s ease;
         }
 
         /* WEWNĘTRZNE KÓŁKO (AVATAR PO WGRANIU ZDJĘCIA) */
@@ -85,7 +85,7 @@
             height: 220px;
             border-radius: 50%;
             border: 6px solid #ffffff;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
             object-fit: cover;
             display: none;
             z-index: 2;
@@ -94,7 +94,7 @@
         }
 
         @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
+            from { transform: scale(0.95); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
         
@@ -110,10 +110,9 @@
             display: none; 
         }
 
-        /* SYGNALIZACJA ETAPU ANALIZY (EFEKT MATERIAŁU/CHUSTY) */
+        /* PULSOWANIE RAMY PODCZAS ANALIZY */
         .workspace-frame.analyzing {
             border: 1px solid var(--text-color);
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
         }
 
         /* SELEKTOR SILNIKÓW */
@@ -144,7 +143,7 @@
         }
         
         .engine-option:disabled, .cta-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
@@ -169,11 +168,11 @@
             opacity: 0.9; 
         }
 
-        /* KOMUNIKAT DRAPINGU */
+        /* KOMUNIKAT ZASTĘPUJĄCY KRĘCĄCE SIĘ KÓŁKO */
         .draping-status-label { 
             display: none;
             font-family: 'Playfair Display', serif; 
-            font-size: 1.1rem; 
+            font-size: 1rem; 
             font-style: italic; 
             margin-top: 20px;
             color: var(--text-color); 
@@ -224,7 +223,7 @@
             white-space: pre-line;
         }
 
-        /* ARCHITEKTURA KOLUMN */
+        /* ARCHITEKTURA TRZECH KOLUMN */
         .rules-row { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
@@ -263,7 +262,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* PRZYCISK RESETU */
         .reset-btn {
             background: none;
             border: 1px solid var(--text-color);
@@ -284,7 +282,6 @@
             color: #fff;
         }
 
-        /* PAYWALL UPSELL */
         .premium-paywall { 
             background: #1c1b1a; 
             color: #fff; 
@@ -350,16 +347,16 @@
 
             <div id="controlsBox">
                 <div class="engine-box">
-                    <button class="engine-option selected" onclick="selectEngine('fusion')">Fuzja Metodologii</button>
-                    <button class="engine-option" onclick="selectEngine('kalisz_science')">Kalisz (Science)</button>
-                    <button class="engine-option" onclick="selectEngine('caygill_art')">Caygill (Art)</button>
-                    <button class="engine-option" onclick="selectEngine('spillane_practical')">Spillane (Practical)</button>
+                    <button class="engine-option selected" id="opt-fusion" onclick="selectEngine('fusion')">Fuzja Metodologii</button>
+                    <button class="engine-option" id="opt-kalisz" onclick="selectEngine('kalisz_science')">Kalisz (Science)</button>
+                    <button class="engine-option" id="opt-caygill" onclick="selectEngine('caygill_art')">Caygill (Art)</button>
+                    <button class="engine-option" id="opt-spillane" onclick="selectEngine('spillane_practical')">Spillane (Practical)</button>
                 </div>
 
-                <button class="cta-btn" id="analyzeBtn" onclick="executeDrapingSequence()">Analizuj Profil</button>
+                <button class="cta-btn" id="analyzeBtn" onclick="startAnalysisPipeline()">Analizuj Profil</button>
             </div>
 
-            <div class="draping-status-label" id="drapingStatusLabel">Przygotowanie próbki...</div>
+            <div class="draping-status-label" id="drapingStatusLabel">Inicjalizacja próbki...</div>
 
             <div class="results-box" id="resultsBox">
                 <div class="verdict-banner">
@@ -399,12 +396,14 @@
     </div>
 
     <script>
-        // ADRES TWEGO PRODUKCYJNEGO WEBHOOKA W n8n (PODMIEŃ PRZED PROD)
-        const N8N_WEBHOOK_URL = "https://TWÓJ-ADRES-N8N.com/webhook/ZMIEŃ-NA-REALNY-ENDPOINT";
+        // UWAGA: WPISZ TU SWÓJ REALNY ADRES Z KLOCKA "WEBHOOK" W N8N (Zrzut image_ef8985.png)
+        const N8N_WEBHOOK_URL = "https://n8n.zmien-na-twoj-serwer.com/webhook/twój-id-endpointu";
 
         let currentEngine = 'fusion';
         let isAnalyzing = false;
-        let base64ImageData = null; // Przechowuje zoptymalizowany plik do wysyłki
+        let compressedBase64 = null; 
+        let drapesInterval = null; 
+        let apiResponseData = null; 
 
         function selectEngine(engine) {
             if (isAnalyzing) return;
@@ -419,97 +418,126 @@
             }
         }
 
+        // KROK 1: INTELIGENTNE POBRANIE I LOCZNA KOMPRESJA GIGANTYCZNYCH PLIKÓW
         function handleImageUpload(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
                 const reader = new FileReader();
+                
                 reader.onload = function(e) {
-                    const avatarImg = document.getElementById('previewAvatar');
-                    const placeholder = document.getElementById('uploadPlaceholder');
-                    const frame = document.getElementById('workspaceFrame');
-                    
-                    avatarImg.src = e.target.result;
-                    avatarImg.style.display = 'block';
-                    placeholder.style.display = 'none';
-                    
-                    frame.style.border = '1px solid #e0deda';
-                    frame.style.backgroundColor = '#fdfcfb';
+                    const img = new Image();
+                    img.onload = function() {
+                        // Tworzymy niewidoczny Canvas do bezstratnego zmniejszenia wagi (Downscaling)
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; // Rozdzielczość w zupełności wystarczająca dla OpenCV w n8n
+                        let width = img.width;
+                        let height = img.height;
 
-                    // Zapisujemy czysty Base64 do payloadu wysyłkowego dla n8n
-                    base64ImageData = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Zapisujemy skompresowany, lekki plik JPEG (Unikamy błędów Payload Too Large)
+                        compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                        // Pokazujemy ładne kółko-avatar wewnątrz ramy
+                        const avatarImg = document.getElementById('previewAvatar');
+                        const placeholder = document.getElementById('uploadPlaceholder');
+                        avatarImg.src = compressedBase64;
+                        avatarImg.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        
+                        document.getElementById('workspaceFrame').style.backgroundColor = '#fdfcfb';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // 🎭 SPEKTAKL CYFROWEGO DRAPOWANIA Z REALNĄ TRANSMISJĄ DANYCH
-        function executeDrapingSequence() {
-            const frame = document.getElementById('workspaceFrame');
-            const controls = document.getElementById('controlsBox');
-            const statusLabel = document.getElementById('drapingStatusLabel');
-            const resultsBox = document.getElementById('resultsBox');
-
-            if (!base64ImageData) {
+        // KROK 2: ORKIESTRACJA SYSTEMU (RÓWNOLEGŁY START UP)
+        function startAnalysisPipeline() {
+            if (!compressedBase64) {
                 alert('Aby rozpocząć profesjonalną analizę, należy najpierw zaimportować portret.');
                 return;
             }
 
-            // Lock UI - Ochrona przed wielokrotnym klikaniem
+            // Lock UI
             isAnalyzing = true;
-            resultsBox.style.display = 'none';
-            controls.style.display = 'none';
-            statusLabel.style.display = 'block';
-            frame.classList.add('analyzing');
+            document.getElementById('resultsBox').style.display = 'none';
+            document.getElementById('controlsBox').style.display = 'none';
+            document.getElementById('drapingStatusLabel').style.display = 'block';
+            document.getElementById('workspaceFrame').classList.add('analyzing');
 
-            // Nasycone chusty pod szyję (Gwarantowane UX zjawiska kontrastu)
-            const drapeChroma = [
-                { text: "Kalibracja optyczna. Test ramy: Zimowa Fuksja [Zima - Chłód i Nasycenie]...", bg: "#e60067" },
-                { text: "Pobieranie próbek pigmentu. Test ramy: Wiosenny Słonecznik [Wiosna - Świetlistość]...", bg: "#ffcc00" },
-                { text: "Analiza waloru. Test ramy: Jesienna Głębia Oliwki [Jesień - Zgaszenie ziemi]...", bg: "#4b5320" },
-                { text: "Pomiar chromatyczności. Test ramy: Letni Pastelowy Szary Róż [Lato - Stonowanie]...", bg: "#d0a9b1" },
-                { text: "Pakiety przesłane. Silnik AI generuje dokumentację końcową...", bg: "#ffffff" }
-            ];
+            apiResponseData = null;
 
-            let step = 0;
-            
-            // Odpalenie animacji wizualnej
-            function playDrapes() {
-                if (step < drapeChroma.length) {
-                    statusLabel.innerText = drapeChroma[step].text;
-                    frame.style.backgroundColor = drapeChroma[step].bg;
-                    step++;
-                    setTimeout(playDrapes, 1600); 
-                } else {
-                    // Po zakończeniu animacji chust, wywołujemy realną transmisję sieciową
-                    sendDataToN8N();
-                }
-            }
-            playDrapes();
+            // 1. ODPALENIE REALNEGO STRZAŁU DO n8n W TLE
+            executeBackendFetch();
+
+            // 2. ODPALENIE PĘTLI ANIMACJI CHUST W RAMIE (ZASTĘPSTWO LOADERA)
+            runDrapingVisualCarousel();
         }
 
-        // ⚡ REALNY STRZAŁ PRODUKCYJNY DO NASZEJ ARCHITEKTURY n8n
-        async function sendDataToN8N() {
+        // KROK 3: REALNA ASYNCHRONICZNA KOMUNIKACJA SIECIOWA (ZABEZPIECZONA TRY/CATCH)
+        async function executeBackendFetch() {
             try {
                 const response = await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        image: base64ImageData,
+                        image: compressedBase64,
                         engine_mode: currentEngine
                     })
                 });
 
-                if (!response.ok) throw new Error("Problem z połączeniem backendowym n8n.");
+                if (!response.ok) throw new Error("Backend n8n odmówił przetworzenia żądania.");
                 
-                const data = await response.json();
-                renderFinalResults(data);
+                apiResponseData = await response.json();
 
             } catch (error) {
-                console.error("Błąd potoku:", error);
+                console.error("[NET_ERROR] Awaria potoku sieci:", error);
                 alert("Wystąpił błąd komunikacji z silnikiem AI. Przywracanie stanu wyjściowego.");
-                abortAnalysis();
+                abortAnalysisPipeline();
             }
         }
 
+        // KROK 4: INTERAKTYWNA KARUZELA CHUST (UX ENGAGEMENT)
+        function runDrapingVisualCarousel() {
+            const frame = document.getElementById('workspaceFrame');
+            const statusLabel = document.getElementById('drapingStatusLabel');
+
+            const framesData = [
+                { text: "Kalibracja spektrum. Test ramy: Zimowa Fuksja [Skrajny Chłód]...", bg: "#e60067" },
+                { text: "Pomiar pigmentów. Test ramy: Wiosenny Słonecznik [Skrajne Ciepło]...", bg: "#ffcc00" },
+                { text: "Próbkowanie kontrastu. Test ramy: Jesienna Oliwka [Zgaszenie ziemi]...", bg: "#4b5320" },
+                { text: "Analiza chromatyczności. Test ramy: Letni Pastelowy Róż [Stonowanie]...", bg: "#d0a9b1" }
+            ];
+
+            let idx = 0;
+
+            drapesInterval = setInterval(() => {
+                // Jeśli serwer już odpowiedział, natychmiast przerywamy pętlę i przechodzimy do renderu
+                if (apiResponseData) {
+                    clearInterval(drapesInterval);
+                    renderFinalResults(apiResponseData);
+                    return;
+                }
+
+                // W przeciwnym razie zapętlamy 4 nasycone kolory wewnątrz kwadratu
+                const currentFrame = framesData[idx % framesData.length];
+                statusLabel.innerText = currentFrame.text;
+                frame.style.backgroundColor = currentFrame.bg;
+                idx++;
+            }, 1400);
+        }
+
+        // KROK 5: DEKONSTRUKCJA I RENDEROWANIE ZWROCONEGO RAPORTU Z 12 SEZONÓW
         function renderFinalResults(payload) {
             const frame = document.getElementById('workspaceFrame');
             frame.classList.remove('analyzing');
@@ -517,14 +545,14 @@
             document.getElementById('drapingStatusLabel').style.display = 'none';
             isAnalyzing = false;
 
-            // Mapowanie danych ze struktury produkcyjnego JSON z n8n
+            // Wyświetlanie nagłówków z n8n
             document.getElementById('resSeason').innerText = payload.identified_season.replace(/_/g, ' ');
             document.getElementById('resMode').innerText = `Tryb interpretacji: ${payload.engine_mode.toUpperCase()}`;
             
-            // n8n przesyła unikalny tekst wygenerowany przez Claude z pola ai_generated_report
-            document.getElementById('resReport').innerText = payload.ai_generated_report || "Brak tekstu raportu.";
+            // Wstrzyknięcie eseju od Claude AI
+            document.getElementById('resReport').innerText = payload.ai_generated_report || "Brak wygenerowanego raportu ze strony modelu.";
 
-            // Bezpieczne parsowanie kontekstu z klocka JavaScript
+            // Dekonstrukcja struktury kontekstu z bazy faktów
             let ctx = {};
             try {
                 ctx = typeof payload.knowledge_context === 'string' ? JSON.parse(payload.knowledge_context) : payload.knowledge_context;
@@ -536,7 +564,6 @@
             
             dK.innerHTML = ''; dC.innerHTML = ''; dS.innerHTML = '';
 
-            // Warunkowe renderowanie kolumn merytorycznych pod wybrany silnik
             if(ctx.kalisz_science_rules && currentEngine !== 'caygill_art' && currentEngine !== 'spillane_practical') {
                 document.getElementById('colKalisz').style.display = 'block';
                 for(let [k,v] of Object.entries(ctx.kalisz_science_rules)) dK.innerHTML += `<div class="rule-entry"><strong>${k.replace(/_/g, ' ')}</strong>${v}</div>`;
@@ -555,14 +582,13 @@
                 }
             } else document.getElementById('colSpillane').style.display = 'none';
 
-            // Płynne wejście raportu
             const resBox = document.getElementById('resultsBox');
             resBox.style.display = 'block';
             resBox.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Wywoływane w przypadku twardego błędu sieci (Safety Fallback)
-        function abortAnalysis() {
+        function abortAnalysisPipeline() {
+            clearInterval(drapesInterval);
             isAnalyzing = false;
             document.getElementById('workspaceFrame').classList.remove('analyzing');
             document.getElementById('workspaceFrame').style.backgroundColor = '#fdfcfb';
@@ -570,25 +596,25 @@
             document.getElementById('controlsBox').style.display = 'flex';
         }
 
-        // 🔄 FUNKCJA PEŁNEGO RESETU INTERFEJSU
         function resetToNewAnalysis() {
+            clearInterval(drapesInterval);
             const avatarImg = document.getElementById('previewAvatar');
             const placeholder = document.getElementById('uploadPlaceholder');
             const frame = document.getElementById('workspaceFrame');
-            const resultsBox = document.getElementById('resultsBox');
-            const controls = document.getElementById('controlsBox');
             
-            resultsBox.style.display = 'none';
+            document.getElementById('resultsBox').style.display = 'none';
             document.getElementById('imageUpload').value = "";
             avatarImg.src = "#";
             avatarImg.style.display = 'none';
-            base64ImageData = null;
+            compressedBase64 = null;
+            apiResponseData = null;
+            isAnalyzing = false;
             
             placeholder.style.display = 'block';
             frame.style.border = '2px dashed #e0deda';
             frame.style.backgroundColor = '#fdfcfb';
             
-            controls.style.display = 'flex';
+            document.getElementById('controlsBox').style.display = 'flex';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
