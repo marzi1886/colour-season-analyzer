@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* POWRÓT DO ORYGINALNEJ, BUTIKOWEJ ESTETYKI */
         :root {
             --bg-color: #faf8f5;
             --text-color: #2b2927;
@@ -27,7 +26,6 @@
             font-family: 'Poppins', sans-serif; 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            transition: background-color 0.8s ease; 
         }
         
         h1, h2, h3, h4 { 
@@ -63,40 +61,59 @@
             text-align: center; 
         }
 
-        /* AWATAR / PODGLĄD ZDJĘCIA W IDEALNYM KÓŁKU */
-        .avatar-container { 
-            width: 180px; 
-            height: 180px; 
-            margin: 0 auto 25px; 
-            position: relative; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: #fdfcfb; 
-            border: 2px dashed #e0deda; 
-            transition: all 0.5s ease; 
-            overflow: hidden;
+        /* 🔳 NOWE DUŻE POLE ROBOCZE (KWADRAT DO DROPOWANIA) */
+        .workspace-frame {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            margin: 0 auto 30px;
+            background: #fdfcfb;
+            border: 2px dashed #e0deda;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
             cursor: pointer;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* 🔘 WEWNĘTRZNE KÓŁKO (AVATAR PO WGRANIU ZDJĘCIA) */
+        .preview-avatar {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 6px solid #ffffff;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            object-fit: cover;
+            display: none;
+            z-index: 2;
+            position: relative;
+            animation: popIn 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
         
-        .avatar-container img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            display: none; 
-            border-radius: 50%; 
-        }
-        
-        .avatar-placeholder { 
+        .upload-placeholder { 
             color: #a39f9a; 
             font-size: 0.85rem; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
+            z-index: 1;
         }
 
         .upload-hidden { 
             display: none; 
+        }
+
+        /* SYGNALIZACJA ETAPU ANALIZY (EFEKT PRAWDZIWEGO MATERIAŁU/CHUSTY) */
+        .workspace-frame.analyzing {
+            border: 1px solid var(--text-color);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
         }
 
         /* SELEKTOR SILNIKÓW */
@@ -147,29 +164,15 @@
             opacity: 0.9; 
         }
 
-        /* INTERAKTYWNY ETAP DRAPINGU (TEST CHUST CHROMATYCZNYCH) */
-        .draping-overlay { 
-            display: none; 
-            margin-top: 20px; 
-        }
-        
-        .draping-status { 
+        /* KOMUNIKAT DRAPINGU */
+        .draping-status-label { 
+            display: none;
             font-family: 'Playfair Display', serif; 
             font-size: 1.1rem; 
             font-style: italic; 
-            margin-bottom: 15px; 
+            margin-top: 20px;
             color: var(--text-color); 
             letter-spacing: 0.5px;
-        }
-        
-        /* Animacja pulsującego pierścienia w trakcie testu */
-        .avatar-container.analyzing { 
-            border-style: solid; 
-            animation: pulseRing 1.5s infinite; 
-        }
-        @keyframes pulseRing { 
-            0% { box-shadow: 0 0 0 0 rgba(43, 41, 39, 0.2); } 
-            100% { box-shadow: 0 0 0 25px rgba(43, 41, 39, 0); } 
         }
 
         /* SEKCJA WYNIKÓW */
@@ -216,7 +219,7 @@
             white-space: pre-line;
         }
 
-        /* ARCHITEKTURA TRZECH KOLUMN WIEDZY */
+        /* ARCHITEKTURA KOLUMN */
         .rules-row { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
@@ -255,7 +258,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* EKSKLUZYWNY KOMPONENT MONETYZACJI (PAYWALL UPSELL) */
+        /* PAYWALL UPSELL */
         .premium-paywall { 
             background: #1c1b1a; 
             color: #fff; 
@@ -263,15 +266,12 @@
             border-radius: 8px; 
             text-align: center; 
             margin-top: 30px; 
-            position: relative;
-            overflow: hidden;
         }
         
         .premium-paywall h3 { 
             color: #e6c687; 
             font-size: 1.5rem; 
             margin-bottom: 12px; 
-            letter-spacing: 1px;
         }
         
         .premium-paywall p { 
@@ -293,17 +293,12 @@
             text-transform: uppercase; 
             font-size: 0.75rem; 
             letter-spacing: 2px; 
-            transition: opacity 0.3s;
-        }
-        
-        .pay-btn:hover { 
-            opacity: 0.95; 
         }
 
-        /* Responsywność dla urządzeń mobilnych */
         @media (max-width: 768px) {
             .rules-row { grid-template-columns: 1fr; gap: 15px; }
-            .verdict-banner h2 { font-size: 1.8rem; }
+            .workspace-frame { max-width: 100%; height: 320px; }
+            .preview-avatar { width: 180px; height: 180px; }
         }
     </style>
 </head>
@@ -318,13 +313,14 @@
         
         <div class="atelier-card">
             
-            <div class="avatar-container" id="avatarBox" onclick="document.getElementById('imageUpload').click()">
-                <div class="avatar-placeholder" id="placeholderTxt">
-                    <i class="fa-solid fa-plus" style="display:block; margin-bottom:8px; font-size:1.2rem; color: var(--accent-gold);"></i>Wgraj Portret
+            <div class="workspace-frame" id="workspaceFrame" onclick="document.getElementById('imageUpload').click()">
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                    <i class="fa-solid fa-expand" style="display:block; margin-bottom:12px; font-size:2rem; color: var(--accent-gold);"></i>
+                    Kliknij lub upuść zdjęcie portretowe
                 </div>
-                <img id="userAvatar" src="#" alt="User Portrait">
+                <img id="previewAvatar" class="preview-avatar" src="#" alt="User Portrait Preview">
             </div>
-            <input type="file" id="imageUpload" class="upload-hidden" accept="image/*" onchange="previewImage(this)">
+            <input type="file" id="imageUpload" class="upload-hidden" accept="image/*" onchange="handleImageUpload(this)">
 
             <div id="controlsBox">
                 <div class="engine-box">
@@ -334,12 +330,10 @@
                     <button class="engine-option" onclick="selectEngine('spillane_practical')">Spillane (Practical)</button>
                 </div>
 
-                <button class="cta-btn" onclick="startDrapingSimulation()">Analizuj Profil</button>
+                <button class="cta-btn" onclick="executeDrapingSequence()">Analizuj Profil</button>
             </div>
 
-            <div class="draping-overlay" id="drapingOverlay">
-                <div class="draping-status" id="drapingStatus">Inicjalizacja systemu wizyjnego...</div>
-            </div>
+            <div class="draping-status-label" id="drapingStatusLabel">Przygotowanie próbki...</div>
 
             <div class="results-box" id="resultsBox">
                 <div class="verdict-banner">
@@ -366,9 +360,9 @@
                 </div>
 
                 <div class="premium-paywall">
-                    <h3>Generuj Cyfrowy Paszport Kolorystyczny PDF</h3>
+                    <h3>Osobisty Paszport Kolorystyczny PDF</h3>
                     <p>Pobierz ekskluzywną, 15-stronicową księgę swojego profilu. Zawiera pełną architekturę szafy kapsułowej, dedykowane zestawienia tkanin oraz szczegółowe zestawienie kosmetyków premium dopasowanych do Twojej melaniny.</p>
-                    <button class="pay-btn" onclick="alert('Trwa konfiguracja produkcyjnej bramki Stripe. Funkcja zakupu PDF zostanie odblokowana przy wdrożeniu produkcyjnym!')">Kup Pełny Paszport • 49 PLN</button>
+                    <button class="pay-btn" onclick="alert('Trwa konfiguracja produkcyjnej bramki Stripe...')">Kup Pełny Paszport • 49 PLN</button>
                 </div>
             </div>
 
@@ -385,75 +379,80 @@
             event.target.classList.add('selected');
         }
 
-        // AKTYWACJA MINIATURKI PO WYBORZE ZDJĘCIA
-        function previewImage(input) {
+        // WYŚWIETLENIE KÓŁKA W DUŻYM KWADRACIE PO WGRANIU
+        function handleImageUpload(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const img = document.getElementById('userAvatar');
-                    const placeholder = document.getElementById('placeholderTxt');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
+                    const avatarImg = document.getElementById('previewAvatar');
+                    const placeholder = document.getElementById('uploadPlaceholder');
+                    const frame = document.getElementById('workspaceFrame');
+                    
+                    avatarImg.src = e.target.result;
+                    avatarImg.style.display = 'block';
                     placeholder.style.display = 'none';
-                    document.getElementById('avatarBox').style.border = '1px solid #e0deda';
+                    
+                    // Stabilizacja ramy na czysty styl
+                    frame.style.border = '1px solid #e0deda';
+                    frame.style.backgroundColor = '#fdfcfb';
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // 🎭 SPEKTAKL PRODUKTOWY: INTELIGENTNY SPEKTROFOTOMETR I DRAPOWANIE
-        function startDrapingSimulation() {
-            const avatarBox = document.getElementById('avatarBox');
-            const controlsBox = document.getElementById('controlsBox');
-            const drapingOverlay = document.getElementById('drapingOverlay');
-            const drapingStatus = document.getElementById('drapingStatus');
+        // 🎭 ELEKTRYZUJĄCA SEKWENCJA PRZYKŁADANIA CHUST (DRAPINGU) WEWNĄTRZ RAMY KWADRATU
+        function executeDrapingSequence() {
+            const frame = document.getElementById('workspaceFrame');
+            const controls = document.getElementById('controlsBox');
+            const statusLabel = document.getElementById('drapingStatusLabel');
             const resultsBox = document.getElementById('resultsBox');
+            const avatarImg = document.getElementById('previewAvatar');
 
-            if (document.getElementById('userAvatar').style.display !== 'block') {
-                alert('Aby uruchomić analizator, należy najpierw zaimportować portret.');
+            if (avatarImg.style.display !== 'block') {
+                alert('Aby rozpocząć profesjonalną analizę, należy najpierw zaimportować portret.');
                 return;
             }
 
-            // Oczyszczenie ekranu do prezentacji drapingu
+            // Czyszczenie i wejście w tryb diagnostyczny chust
             resultsBox.style.display = 'none';
-            controlsBox.style.display = 'none';
-            drapingOverlay.style.display = 'block';
-            avatarBox.classList.add('analyzing');
+            controls.style.display = 'none';
+            statusLabel.style.display = 'block';
+            frame.classList.add('analyzing');
 
-            // Scenariusz kroków chust chromatycznych dla wywołania złudzenia optycznego u klienta
-            const drapery = [
-                { text: "Kalibracja spektrum. Test chusty: Zimowa Fuksja [Zima - Kontrast i Chłód]...", color: "#fcd5ce", border: "#d90429" },
-                { text: "Analiza reakcji pigmentu. Test chusty: Wiosenna Brzoskwinia [Wiosna - Świetlistość i Ciepło]...", color: "#faedcd", border: "#ffb703" },
-                { text: "Pomiar absorpcji światła. Test chusty: Jesienna Oliwka [Jesień - Głębia i Zgaszenie]...", color: "#e9edc9", border: "#606c38" },
-                { text: "Badanie chromatyczności skóry. Test chusty: Letni Pastelowy Róż [Lato - Stonowanie i Pastel]...", color: "#f0e6ef", border: "#ffb5a7" },
-                { text: "Przesyłanie parametrów analitycznych. Agent AI formułuje raport końcowy...", color: "#faf8f5", border: "#2b2927" }
+            // 🎨 Ultra-nasycone barwy testowe bezpośrednio pod twarz
+            const drapeChroma = [
+                { text: "Test ramy: Zimowa Fuksja [Skrajny Chłód i Nasycenie]...", bg: "#e60067" },
+                { text: "Test ramy: Wiosenny Słonecznik [Skrajne Ciepło i Jasność]...", bg: "#ffcc00" },
+                { text: "Test ramy: Jesienna Głębia Oliwki [Głębokie Zgaszenie Ziemi]...", bg: "#4b5320" },
+                { text: "Test ramy: Letni Pastelowy Szary Róż [Stonowanie i Chłód]...", bg: "#d0a9b1" },
+                { text: "Przetwarzanie profilu przez moduł Claude AI. Generowanie dokumentacji...", bg: "#ffffff" }
             ];
 
-            let stepIdx = 0;
+            let index = 0;
 
-            function processDraping() {
-                if (stepIdx < drapery.length) {
-                    drapingStatus.innerText = drapery[stepIdx].text;
-                    document.body.style.backgroundColor = drapery[stepIdx].color;
-                    avatarBox.style.borderColor = drapery[stepIdx].border;
+            function playDrapes() {
+                if (index < drapeChroma.length) {
+                    statusLabel.innerText = drapeChroma[index].text;
+                    frame.style.backgroundColor = drapeChroma[index].bg;
                     
-                    stepIdx++;
-                    setTimeout(processDraping, 1600); // 1.6 sekundy ekspozycji na każdą porę roku
+                    index++;
+                    setTimeout(playDrapes, 1700); // 1.7 sekundy skupienia uwagi na danej barwie chusty
                 } else {
-                    renderFinalPayload();
+                    renderFinalResults();
                 }
             }
 
-            processDraping();
+            playDrapes();
         }
 
-        function renderFinalPayload() {
-            document.getElementById('avatarBox').classList.remove('analyzing');
-            document.getElementById('drapingOverlay').style.display = 'none';
+        function renderFinalResults() {
+            const frame = document.getElementById('workspaceFrame');
+            frame.classList.remove('analyzing');
+            frame.style.backgroundColor = '#fdfcfb'; // Przywrócenie ramy do bazy
+            document.getElementById('drapingStatusLabel').style.display = 'none';
             document.getElementById('controlsBox').style.display = 'block';
-            document.body.style.backgroundColor = '#faf8f5'; // Powrót do czystego, butikowego tła
 
-            // SYMULACJA STRZAŁU PRODUKCYJNEGO Z REAKCJĄ NA NASZ BANK 12 SEZONÓW W N8N
+            // DANE Z WEBHOOKA n8n (Symulacja Twojego silnika 12 sezonów)
             const mockN8NResponse = {
                 "identified_season": "Soft_Autumn",
                 "engine_mode": currentEngine,
@@ -465,7 +464,7 @@
                 }
             };
 
-            // Mapowanie danych do struktury UI
+            // Mapowanie danych do widoku końcowego
             document.getElementById('resSeason').innerText = mockN8NResponse.identified_season.replace(/_/g, ' ');
             document.getElementById('resMode').innerText = `Tryb interpretacji: ${mockN8NResponse.engine_mode.toUpperCase()}`;
             document.getElementById('resReport').innerText = mockN8NResponse.ai_report;
@@ -477,7 +476,6 @@
             
             dK.innerHTML = ''; dC.innerHTML = ''; dS.innerHTML = '';
 
-            // Warunkowa dekonstrukcja kolumn pod wybrany silnik biznesowy
             if(ctx.kalisz_science_rules && currentEngine !== 'caygill_art' && currentEngine !== 'spillane_practical') {
                 document.getElementById('colKalisz').style.display = 'block';
                 for(let [k,v] of Object.entries(ctx.kalisz_science_rules)) dK.innerHTML += `<div class="rule-entry"><strong>${k.replace(/_/g, ' ')}</strong>${v}</div>`;
@@ -496,7 +494,6 @@
                 }
             } else document.getElementById('colSpillane').style.display = 'none';
 
-            // Uruchomienie płynnej animacji wejścia raportu
             const resBox = document.getElementById('resultsBox');
             resBox.style.display = 'block';
             resBox.scrollIntoView({ behavior: 'smooth' });
