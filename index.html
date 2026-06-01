@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Color Atelier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,400;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -61,7 +61,7 @@
             text-align: center; 
         }
 
-        /* 🔳 NOWE DUŻE POLE ROBOCZE (KWADRAT DO DROPOWANIA) */
+        /* DUŻE POLE ROBOCZE (KWADRAT DO DROPOWANIA) */
         .workspace-frame {
             width: 100%;
             max-width: 400px;
@@ -79,7 +79,7 @@
             transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* 🔘 WEWNĘTRZNE KÓŁKO (AVATAR PO WGRANIU ZDJĘCIA) */
+        /* WEWNĘTRZNE KÓŁKO (AVATAR PO WGRANIU ZDJĘCIA) */
         .preview-avatar {
             width: 220px;
             height: 220px;
@@ -110,7 +110,7 @@
             display: none; 
         }
 
-        /* SYGNALIZACJA ETAPU ANALIZY (EFEKT PRAWDZIWEGO MATERIAŁU/CHUSTY) */
+        /* SYGNALIZACJA ETAPU ANALIZY (EFEKT MATERIAŁU/CHUSTY) */
         .workspace-frame.analyzing {
             border: 1px solid var(--text-color);
             box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
@@ -142,6 +142,11 @@
             background: var(--text-color); 
             color: #fff; 
         }
+        
+        .engine-option:disabled, .cta-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         .cta-btn { 
             background: var(--text-color); 
@@ -160,7 +165,7 @@
             display: block;
         }
         
-        .cta-btn:hover { 
+        .cta-btn:hover:not(:disabled) { 
             opacity: 0.9; 
         }
 
@@ -258,6 +263,27 @@
             letter-spacing: 0.5px;
         }
 
+        /* PRZYCISK RESETU */
+        .reset-btn {
+            background: none;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 auto 30px;
+            display: block;
+        }
+        .reset-btn:hover {
+            background: var(--text-color);
+            color: #fff;
+        }
+
         /* PAYWALL UPSELL */
         .premium-paywall { 
             background: #1c1b1a; 
@@ -313,7 +339,7 @@
         
         <div class="atelier-card">
             
-            <div class="workspace-frame" id="workspaceFrame" onclick="document.getElementById('imageUpload').click()">
+            <div class="workspace-frame" id="workspaceFrame" onclick="triggerUploadClick()">
                 <div class="upload-placeholder" id="uploadPlaceholder">
                     <i class="fa-solid fa-expand" style="display:block; margin-bottom:12px; font-size:2rem; color: var(--accent-gold);"></i>
                     Kliknij lub upuść zdjęcie portretowe
@@ -330,7 +356,7 @@
                     <button class="engine-option" onclick="selectEngine('spillane_practical')">Spillane (Practical)</button>
                 </div>
 
-                <button class="cta-btn" onclick="executeDrapingSequence()">Analizuj Profil</button>
+                <button class="cta-btn" id="analyzeBtn" onclick="executeDrapingSequence()">Analizuj Profil</button>
             </div>
 
             <div class="draping-status-label" id="drapingStatusLabel">Przygotowanie próbki...</div>
@@ -359,6 +385,8 @@
                     </div>
                 </div>
 
+                <button class="reset-btn" onclick="resetToNewAnalysis()"><i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Analizuj inne zdjęcie</button>
+
                 <div class="premium-paywall">
                     <h3>Osobisty Paszport Kolorystyczny PDF</h3>
                     <p>Pobierz ekskluzywną, 15-stronicową księgę swojego profilu. Zawiera pełną architekturę szafy kapsułowej, dedykowane zestawienia tkanin oraz szczegółowe zestawienie kosmetyków premium dopasowanych do Twojej melaniny.</p>
@@ -371,15 +399,26 @@
     </div>
 
     <script>
+        // ADRES TWEGO PRODUKCYJNEGO WEBHOOKA W n8n (PODMIEŃ PRZED PROD)
+        const N8N_WEBHOOK_URL = "https://TWÓJ-ADRES-N8N.com/webhook/ZMIEŃ-NA-REALNY-ENDPOINT";
+
         let currentEngine = 'fusion';
+        let isAnalyzing = false;
+        let base64ImageData = null; // Przechowuje zoptymalizowany plik do wysyłki
 
         function selectEngine(engine) {
+            if (isAnalyzing) return;
             currentEngine = engine;
             document.querySelectorAll('.engine-option').forEach(btn => btn.classList.remove('selected'));
             event.target.classList.add('selected');
         }
 
-        // WYŚWIETLENIE KÓŁKA W DUŻYM KWADRACIE PO WGRANIU
+        function triggerUploadClick() {
+            if (!isAnalyzing) {
+                document.getElementById('imageUpload').click();
+            }
+        }
+
         function handleImageUpload(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -392,90 +431,112 @@
                     avatarImg.style.display = 'block';
                     placeholder.style.display = 'none';
                     
-                    // Stabilizacja ramy na czysty styl
                     frame.style.border = '1px solid #e0deda';
                     frame.style.backgroundColor = '#fdfcfb';
+
+                    // Zapisujemy czysty Base64 do payloadu wysyłkowego dla n8n
+                    base64ImageData = e.target.result;
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // 🎭 ELEKTRYZUJĄCA SEKWENCJA PRZYKŁADANIA CHUST (DRAPINGU) WEWNĄTRZ RAMY KWADRATU
+        // 🎭 SPEKTAKL CYFROWEGO DRAPOWANIA Z REALNĄ TRANSMISJĄ DANYCH
         function executeDrapingSequence() {
             const frame = document.getElementById('workspaceFrame');
             const controls = document.getElementById('controlsBox');
             const statusLabel = document.getElementById('drapingStatusLabel');
             const resultsBox = document.getElementById('resultsBox');
-            const avatarImg = document.getElementById('previewAvatar');
 
-            if (avatarImg.style.display !== 'block') {
+            if (!base64ImageData) {
                 alert('Aby rozpocząć profesjonalną analizę, należy najpierw zaimportować portret.');
                 return;
             }
 
-            // Czyszczenie i wejście w tryb diagnostyczny chust
+            // Lock UI - Ochrona przed wielokrotnym klikaniem
+            isAnalyzing = true;
             resultsBox.style.display = 'none';
             controls.style.display = 'none';
             statusLabel.style.display = 'block';
             frame.classList.add('analyzing');
 
-            // 🎨 Ultra-nasycone barwy testowe bezpośrednio pod twarz
+            // Nasycone chusty pod szyję (Gwarantowane UX zjawiska kontrastu)
             const drapeChroma = [
-                { text: "Test ramy: Zimowa Fuksja [Skrajny Chłód i Nasycenie]...", bg: "#e60067" },
-                { text: "Test ramy: Wiosenny Słonecznik [Skrajne Ciepło i Jasność]...", bg: "#ffcc00" },
-                { text: "Test ramy: Jesienna Głębia Oliwki [Głębokie Zgaszenie Ziemi]...", bg: "#4b5320" },
-                { text: "Test ramy: Letni Pastelowy Szary Róż [Stonowanie i Chłód]...", bg: "#d0a9b1" },
-                { text: "Przetwarzanie profilu przez moduł Claude AI. Generowanie dokumentacji...", bg: "#ffffff" }
+                { text: "Kalibracja optyczna. Test ramy: Zimowa Fuksja [Zima - Chłód i Nasycenie]...", bg: "#e60067" },
+                { text: "Pobieranie próbek pigmentu. Test ramy: Wiosenny Słonecznik [Wiosna - Świetlistość]...", bg: "#ffcc00" },
+                { text: "Analiza waloru. Test ramy: Jesienna Głębia Oliwki [Jesień - Zgaszenie ziemi]...", bg: "#4b5320" },
+                { text: "Pomiar chromatyczności. Test ramy: Letni Pastelowy Szary Róż [Lato - Stonowanie]...", bg: "#d0a9b1" },
+                { text: "Pakiety przesłane. Silnik AI generuje dokumentację końcową...", bg: "#ffffff" }
             ];
 
-            let index = 0;
-
+            let step = 0;
+            
+            // Odpalenie animacji wizualnej
             function playDrapes() {
-                if (index < drapeChroma.length) {
-                    statusLabel.innerText = drapeChroma[index].text;
-                    frame.style.backgroundColor = drapeChroma[index].bg;
-                    
-                    index++;
-                    setTimeout(playDrapes, 1700); // 1.7 sekundy skupienia uwagi na danej barwie chusty
+                if (step < drapeChroma.length) {
+                    statusLabel.innerText = drapeChroma[step].text;
+                    frame.style.backgroundColor = drapeChroma[step].bg;
+                    step++;
+                    setTimeout(playDrapes, 1600); 
                 } else {
-                    renderFinalResults();
+                    // Po zakończeniu animacji chust, wywołujemy realną transmisję sieciową
+                    sendDataToN8N();
                 }
             }
-
             playDrapes();
         }
 
-        function renderFinalResults() {
+        // ⚡ REALNY STRZAŁ PRODUKCYJNY DO NASZEJ ARCHITEKTURY n8n
+        async function sendDataToN8N() {
+            try {
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: base64ImageData,
+                        engine_mode: currentEngine
+                    })
+                });
+
+                if (!response.ok) throw new Error("Problem z połączeniem backendowym n8n.");
+                
+                const data = await response.json();
+                renderFinalResults(data);
+
+            } catch (error) {
+                console.error("Błąd potoku:", error);
+                alert("Wystąpił błąd komunikacji z silnikiem AI. Przywracanie stanu wyjściowego.");
+                abortAnalysis();
+            }
+        }
+
+        function renderFinalResults(payload) {
             const frame = document.getElementById('workspaceFrame');
             frame.classList.remove('analyzing');
-            frame.style.backgroundColor = '#fdfcfb'; // Przywrócenie ramy do bazy
+            frame.style.backgroundColor = '#fdfcfb'; 
             document.getElementById('drapingStatusLabel').style.display = 'none';
-            document.getElementById('controlsBox').style.display = 'block';
+            isAnalyzing = false;
 
-            // DANE Z WEBHOOKA n8n (Symulacja Twojego silnika 12 sezonów)
-            const mockN8NResponse = {
-                "identified_season": "Soft_Autumn",
-                "engine_mode": currentEngine,
-                "ai_report": "Twoje tkanki skórne wykazują głęboką symetrię optyczną w kontakcie ze stłumionym, rozproszonym światłem. Przeprowadzona symulacja drapingu jednoznacznie wykazała, że czysta, zimowa fuksja wywołuje niepożądany efekt bladości naczyniowej, podczas gdy jesienna oliwka oraz ciepła, stłumiona brzoskwinia natychmiast optycznie wygładziły strukturę skóry, nadając jej aksamitne wykończenie.\n\nJako reprezentantka profilu Soft Autumn, Twoja naturalna uroda rozkwita w otoczeniu kolorów ziemi, zgaszonego khaki oraz matowego złota. Unikaj skrajnych kontrastów oraz uderzających, czystych neonów.",
-                "context": {
-                    "kalisz_science_rules": { "undertone": "warm-neutral (blisko granicy lata)", "contrast": "low-to-medium", "primary_dimension": "muted-chroma (zgaszenie)" },
-                    "caygill_art_rules": { "archetype": "Muted Autumn (Zamglona Jesień)", "vibe": "serene, late-afternoon glow, spokój", "textures": "velvety, suede-like, mat" },
-                    "spillane_practical_rules": { "base_capsule": ["Oatmeal", "Soft Khaki", "Muted Olive"], "lipstick": "Warm Nude, Dusty Peach", "jewelry": "matte gold, satin brass" }
-                }
-            };
+            // Mapowanie danych ze struktury produkcyjnego JSON z n8n
+            document.getElementById('resSeason').innerText = payload.identified_season.replace(/_/g, ' ');
+            document.getElementById('resMode').innerText = `Tryb interpretacji: ${payload.engine_mode.toUpperCase()}`;
+            
+            // n8n przesyła unikalny tekst wygenerowany przez Claude z pola ai_generated_report
+            document.getElementById('resReport').innerText = payload.ai_generated_report || "Brak tekstu raportu.";
 
-            // Mapowanie danych do widoku końcowego
-            document.getElementById('resSeason').innerText = mockN8NResponse.identified_season.replace(/_/g, ' ');
-            document.getElementById('resMode').innerText = `Tryb interpretacji: ${mockN8NResponse.engine_mode.toUpperCase()}`;
-            document.getElementById('resReport').innerText = mockN8NResponse.ai_report;
+            // Bezpieczne parsowanie kontekstu z klocka JavaScript
+            let ctx = {};
+            try {
+                ctx = typeof payload.knowledge_context === 'string' ? JSON.parse(payload.knowledge_context) : payload.knowledge_context;
+            } catch(e) { ctx = payload.knowledge_context || {}; }
 
-            const ctx = mockN8NResponse.context;
             const dK = document.getElementById('dataKalisz');
             const dC = document.getElementById('dataCaygill');
             const dS = document.getElementById('dataSpillane');
             
             dK.innerHTML = ''; dC.innerHTML = ''; dS.innerHTML = '';
 
+            // Warunkowe renderowanie kolumn merytorycznych pod wybrany silnik
             if(ctx.kalisz_science_rules && currentEngine !== 'caygill_art' && currentEngine !== 'spillane_practical') {
                 document.getElementById('colKalisz').style.display = 'block';
                 for(let [k,v] of Object.entries(ctx.kalisz_science_rules)) dK.innerHTML += `<div class="rule-entry"><strong>${k.replace(/_/g, ' ')}</strong>${v}</div>`;
@@ -494,9 +555,41 @@
                 }
             } else document.getElementById('colSpillane').style.display = 'none';
 
+            // Płynne wejście raportu
             const resBox = document.getElementById('resultsBox');
             resBox.style.display = 'block';
             resBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Wywoływane w przypadku twardego błędu sieci (Safety Fallback)
+        function abortAnalysis() {
+            isAnalyzing = false;
+            document.getElementById('workspaceFrame').classList.remove('analyzing');
+            document.getElementById('workspaceFrame').style.backgroundColor = '#fdfcfb';
+            document.getElementById('drapingStatusLabel').style.display = 'none';
+            document.getElementById('controlsBox').style.display = 'flex';
+        }
+
+        // 🔄 FUNKCJA PEŁNEGO RESETU INTERFEJSU
+        function resetToNewAnalysis() {
+            const avatarImg = document.getElementById('previewAvatar');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const frame = document.getElementById('workspaceFrame');
+            const resultsBox = document.getElementById('resultsBox');
+            const controls = document.getElementById('controlsBox');
+            
+            resultsBox.style.display = 'none';
+            document.getElementById('imageUpload').value = "";
+            avatarImg.src = "#";
+            avatarImg.style.display = 'none';
+            base64ImageData = null;
+            
+            placeholder.style.display = 'block';
+            frame.style.border = '2px dashed #e0deda';
+            frame.style.backgroundColor = '#fdfcfb';
+            
+            controls.style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
