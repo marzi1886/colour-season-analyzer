@@ -396,7 +396,8 @@
     </div>
 
     <script>
-        const N8N_WEBHOOK_URL = "https://marzi91.app.n8n.cloud/webhook-test/analiza-kolorystyczna";
+        // URUCHOMILIŚMY UTWARDZONY LINK PRODUKCYJNY (BEZ SŁOWA -TEST) ZGODNIE Z AKTYWNYM WORFLOW W N8N
+        const N8N_WEBHOOK_URL = "https://marzi91.app.n8n.cloud/webhook/analiza-kolorystyczna";
 
         let currentEngine = 'fusion';
         let isAnalyzing = false;
@@ -455,7 +456,6 @@
             }
         }
 
-        // AKTYWACJA PROCESU: URUCHOMIENIE RÓWNOLEGŁE
         function startAnalysisPipeline() {
             if (!compressedBase64) {
                 alert('Aby rozpocząć profesjonalną analizę, należy najpierw zaimportować portret.');
@@ -468,14 +468,10 @@
             document.getElementById('drapingStatusLabel').style.display = 'block';
             document.getElementById('workspaceFrame').classList.add('analyzing');
 
-            // 1. Karuzela wizualna (UX Placeholder) rusza od razu
             runDrapingVisualCarousel();
-
-            // 2. Realny strzał sieciowy wykonuje się asynchronicznie pod maską
             executeBackendFetch();
         }
 
-        // WYDOBYWANIE DANYCH SIECIOWYCH W CZASIE RZECZYWISTYM
         async function executeBackendFetch() {
             try {
                 const response = await fetch(N8N_WEBHOOK_URL, {
@@ -491,7 +487,6 @@
                 
                 const apiData = await response.json();
                 
-                // Zatrzymujemy karuzelę i wypychamy realne dane produkcyjne
                 clearInterval(drapesInterval);
                 renderFinalResults(apiData);
 
