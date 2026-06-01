@@ -396,14 +396,12 @@
     </div>
 
     <script>
-        // UWAGA: WPISZ TU SWÓJ REALNY ADRES Z KLOCKA "WEBHOOK" W N8N (Zrzut image_ef8985.png)
         const N8N_WEBHOOK_URL = "https://marzi91.app.n8n.cloud/webhook-test/analiza-kolorystyczna";
 
         let currentEngine = 'fusion';
         let isAnalyzing = false;
         let compressedBase64 = null; 
         let drapesInterval = null; 
-        let apiResponseData = null; 
 
         function selectEngine(engine) {
             if (isAnalyzing) return;
@@ -418,7 +416,6 @@
             }
         }
 
-        // KROK 1: INTELIGENTNE POBRANIE I LOCZNA KOMPRESJA GIGANTYCZNYCH PLIKÓW
         function handleImageUpload(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -427,9 +424,8 @@
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = function() {
-                        // Tworzymy niewidoczny Canvas do bezstratnego zmniejszenia wagi (Downscaling)
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800; // Rozdzielczość w zupełności wystarczająca dla OpenCV w n8n
+                        const MAX_WIDTH = 800; 
                         let width = img.width;
                         let height = img.height;
 
@@ -443,10 +439,8 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Zapisujemy skompresowany, lekki plik JPEG (Unikamy błędów Payload Too Large)
                         compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
-                        // Pokazujemy ładne kółko-avatar wewnątrz ramy
                         const avatarImg = document.getElementById('previewAvatar');
                         const placeholder = document.getElementById('uploadPlaceholder');
                         avatarImg.src = compressedBase64;
@@ -461,30 +455,27 @@
             }
         }
 
-        // KROK 2: ORKIESTRACJA SYSTEMU (RÓWNOLEGŁY START UP)
+        // AKTYWACJA PROCESU: URUCHOMIENIE RÓWNOLEGŁE
         function startAnalysisPipeline() {
             if (!compressedBase64) {
                 alert('Aby rozpocząć profesjonalną analizę, należy najpierw zaimportować portret.');
                 return;
             }
 
-            // Lock UI
             isAnalyzing = true;
             document.getElementById('resultsBox').style.display = 'none';
             document.getElementById('controlsBox').style.display = 'none';
             document.getElementById('drapingStatusLabel').style.display = 'block';
             document.getElementById('workspaceFrame').classList.add('analyzing');
 
-            apiResponseData = null;
-
-            // 1. ODPALENIE REALNEGO STRZAŁU DO n8n W TLE
-            executeBackendFetch();
-
-            // 2. ODPALENIE PĘTLI ANIMACJI CHUST W RAMIE (ZASTĘPSTWO LOADERA)
+            // 1. Karuzela wizualna (UX Placeholder) rusza od razu
             runDrapingVisualCarousel();
+
+            // 2. Realny strzał sieciowy wykonuje się asynchronicznie pod maską
+            executeBackendFetch();
         }
 
-        // KROK 3: REALNA ASYNCHRONICZNA KOMUNIKACJA SIECIOWA (ZABEZPIECZONA TRY/CATCH)
+        // WYDOBYWANIE DANYCH SIECIOWYCH W CZASIE RZECZYWISTYM
         async function executeBackendFetch() {
             try {
                 const response = await fetch(N8N_WEBHOOK_URL, {
@@ -496,18 +487,21 @@
                     })
                 });
 
-                if (!response.ok) throw new Error("Backend n8n odmówił przetworzenia żądania.");
+                if (!response.ok) throw new Error("Materiały odrzucone przez serwer.");
                 
-                apiResponseData = await response.json();
+                const apiData = await response.json();
+                
+                // Zatrzymujemy karuzelę i wypychamy realne dane produkcyjne
+                clearInterval(drapesInterval);
+                renderFinalResults(apiData);
 
             } catch (error) {
-                console.error("[NET_ERROR] Awaria potoku sieci:", error);
+                console.error("[NET_ERROR] Potok przerwany:", error);
                 alert("Wystąpił błąd komunikacji z silnikiem AI. Przywracanie stanu wyjściowego.");
                 abortAnalysisPipeline();
             }
         }
 
-        // KROK 4: INTERAKTYWNA KARUZELA CHUST (UX ENGAGEMENT)
         function runDrapingVisualCarousel() {
             const frame = document.getElementById('workspaceFrame');
             const statusLabel = document.getElementById('drapingStatusLabel');
@@ -520,16 +514,7 @@
             ];
 
             let idx = 0;
-
             drapesInterval = setInterval(() => {
-                // Jeśli serwer już odpowiedział, natychmiast przerywamy pętlę i przechodzimy do renderu
-                if (apiResponseData) {
-                    clearInterval(drapesInterval);
-                    renderFinalResults(apiResponseData);
-                    return;
-                }
-
-                // W przeciwnym razie zapętlamy 4 nasycone kolory wewnątrz kwadratu
                 const currentFrame = framesData[idx % framesData.length];
                 statusLabel.innerText = currentFrame.text;
                 frame.style.backgroundColor = currentFrame.bg;
@@ -537,7 +522,6 @@
             }, 1400);
         }
 
-        // KROK 5: DEKONSTRUKCJA I RENDEROWANIE ZWROCONEGO RAPORTU Z 12 SEZONÓW
         function renderFinalResults(payload) {
             const frame = document.getElementById('workspaceFrame');
             frame.classList.remove('analyzing');
@@ -545,14 +529,10 @@
             document.getElementById('drapingStatusLabel').style.display = 'none';
             isAnalyzing = false;
 
-            // Wyświetlanie nagłówków z n8n
             document.getElementById('resSeason').innerText = payload.identified_season.replace(/_/g, ' ');
             document.getElementById('resMode').innerText = `Tryb interpretacji: ${payload.engine_mode.toUpperCase()}`;
-            
-            // Wstrzyknięcie eseju od Claude AI
-            document.getElementById('resReport').innerText = payload.ai_generated_report || "Brak wygenerowanego raportu ze strony modelu.";
+            document.getElementById('resReport').innerText = payload.ai_generated_report || "Brak danych raportu.";
 
-            // Dekonstrukcja struktury kontekstu z bazy faktów
             let ctx = {};
             try {
                 ctx = typeof payload.knowledge_context === 'string' ? JSON.parse(payload.knowledge_context) : payload.knowledge_context;
@@ -607,7 +587,6 @@
             avatarImg.src = "#";
             avatarImg.style.display = 'none';
             compressedBase64 = null;
-            apiResponseData = null;
             isAnalyzing = false;
             
             placeholder.style.display = 'block';
