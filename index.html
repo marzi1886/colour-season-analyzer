@@ -93,7 +93,7 @@
         .loader { display: none; margin: 30px auto; border: 2px solid #f3f3f3; border-top: 2px solid var(--text-primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* UKRYCIE WIZUALNE SZABLONU PDF DLA CZŁOWIEKA, ALE POZOSTAWIENIE WIDOCZNOŚCI DLA SILNIKA RENDERUJĄCEGO */
+        /* UKRYCIE WIZUALNE SZABLONU PDF DLA CZŁOWIEKA, ALE POZOSTAWIENIE PEŁNEJ WIDOCZNOŚCI DLA PARSERA DOM */
         .pdf-template-container {
             position: absolute;
             left: -9999px;
@@ -447,6 +447,7 @@
             btn.innerText = "GENEROWANIE PASZPORTU...";
             btn.disabled = true;
 
+            // Wstrzykiwanie tekstu przez bezpieczne textContent (XSS Protection)
             document.getElementById('pdfSeason').textContent = globalLastApiData.identified_season ? globalLastApiData.identified_season.replace(/_/g, ' ') : "---";
             document.getElementById('pdfMode').textContent = `TRYB EKSTRAKCJI: ${globalLastApiData.engine_mode ? globalLastApiData.engine_mode.toUpperCase() : "FUSION"}`;
             document.getElementById('pdfReportText').textContent = globalLastApiData.ai_generated_report || "Brak danych.";
@@ -476,7 +477,15 @@
                 dumpContainer.appendChild(ruleRow);
             }
 
-            const element = document.getElementById('pdfTemplate');
+            // GŁĘBOKIE KLONOWANIE WĘZŁA DOM W PAMIĘCI PODRĘCZNEJ PRZEGLĄDARKI
+            const originalElement = document.getElementById('pdfTemplate');
+            const clonedElement = originalElement.cloneNode(true);
+            
+            // Wymuszenie jawnych stylów pozycjonowania dla interpretera html2canvas
+            clonedElement.style.position = 'relative';
+            clonedElement.style.left = '0';
+            clonedElement.style.top = '0';
+            clonedElement.style.display = 'block';
 
             const options = {
                 margin:       10,
@@ -486,15 +495,18 @@
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(options).from(element).save().then(() => {
-                btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
-                btn.disabled = false;
-            }).catch(err => {
-                console.error("PDF Engine Error:", err);
-                btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
-                btn.disabled = false;
-                alert("Wystąpił błąd silnika PDF podczas generowania pliku.");
-            });
+            // OPÓŹNIENIE ASYNCHRONICZNE (300ms) - Czas dla silnika na rozłożenie geometrii czcionek
+            setTimeout(() => {
+                html2pdf().set(options).from(clonedElement).save().then(() => {
+                    btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
+                    btn.disabled = false;
+                }).catch(err => {
+                    console.error("PDF Engine Error:", err);
+                    btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
+                    btn.disabled = false;
+                    alert("Wystąpił błąd silnika PDF podczas generowania pliku.");
+                });
+            }, 300);
         }
     </script>
 </body>
