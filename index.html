@@ -183,35 +183,108 @@
         }
 
         function handleImageSelection(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800; 
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                        document.getElementById('uploadStatusText').innerText = "PORTRET ZAIMPORTEDOWANY POMYŚLNIE ✔";
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+            if (!input.files || !input.files[0]) {
+                return;
             }
+
+            const file = input.files[0];
+            const statusText = document.getElementById('uploadStatusText');
+
+            // ==========================================
+            // WARSTWA OBRONY 1: Bezwzględny limit rozmiaru (5 MB)
+            // Zapobiega atakom DoS i zamrażaniu pamięci przeglądarki
+            // ==========================================
+            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+            if (file.size > MAX_FILE_SIZE) {
+                alert("BŁĄD BEZPIECZEŃSTWA: Plik jest zbyt duży. Maksymalny rozmiar to 5MB.");
+                input.value = ''; // Reset inputu
+                compressedBase64 = null;
+                return;
+            }
+
+            // ==========================================
+            // WARSTWA OBRONY 2: Rygorystyczna walidacja rozszerzenia i typu MIME
+            // Ochrona przed plikami wykonywalnymi maskowanymi jako zdjęcia
+            // ==========================================
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+            if (!allowedExtensions.exec(file.name)) {
+                alert("BŁĄD BEZPIECZEŃSTWA: Niedozwolone rozszerzenie pliku. Dozwolone: JPG, JPEG, PNG, WEBP.");
+                input.value = '';
+                compressedBase64 = null;
+                return;
+            }
+
+            const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!allowedMimeTypes.includes(file.type)) {
+                alert("BŁĄD BEZPIECZEŃSTWA: Niepoprawny typ danych (MIME Type).");
+                input.value = '';
+                compressedBase64 = null;
+                return;
+            }
+
+            statusText.innerText = "PRZETWARZANIE STRUKTURY OBRAZU...";
+
+            const reader = new FileReader();
+            
+            reader.onerror = function() {
+                alert("BŁĄD: Naruszenie integralności pliku podczas odczytu.");
+                statusText.innerText = "BŁĄD IMPORTU";
+            };
+
+            reader.onload = function(e) {
+                const img = new Image();
+                
+                // ==========================================
+                // WARSTWA OBRONY 3: Ochrona przed Pixel Bomb (Decompression Bomb)
+                // ==========================================
+                img.onerror = function() {
+                    alert("BŁĄD BEZPIECZEŃSTWA: Plik nagłówkowy uszkodzony lub wykryto ukrytą zawartość niebędącą obrazem.");
+                    statusText.innerText = "BŁĄD WALIDACJI STRUKTURY";
+                    input.value = '';
+                    compressedBase64 = null;
+                };
+
+                img.onload = function() {
+                    const MAX_ALLOWED_DIMENSION = 8000; 
+                    if (img.width > MAX_ALLOWED_DIMENSION || img.height > MAX_ALLOWED_DIMENSION) {
+                        alert("BŁĄD BEZPIECZEŃSTWA: Rozdzielczość obrazu przekracza bezpieczny limit.");
+                        input.value = '';
+                        compressedBase64 = null;
+                        return;
+                    }
+
+                    const CANVAS_TARGET_WIDTH = 800; 
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > CANVAS_TARGET_WIDTH) {
+                        height *= CANVAS_TARGET_WIDTH / width;
+                        width = CANVAS_TARGET_WIDTH;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        alert("Błąd systemowy: Nie można zainicjalizować kontekstu graficznego.");
+                        return;
+                    }
+
+                    // ==========================================
+                    // WARSTWA OBRONY 4: Sanitarnizacja obrazu (czyszczenie EXIF i skryptów)
+                    // ==========================================
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    statusText.innerText = "PORTRET ZAWERYFIKOWANY I ZABEZPIECZONY ✔";
+                };
+
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
         }
 
         async function runAnalysis() {
