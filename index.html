@@ -93,7 +93,15 @@
         .loader { display: none; margin: 30px auto; border: 2px solid #f3f3f3; border-top: 2px solid var(--text-primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* TEKSTURA I STYLE UKRYTEGO SZABLONU PDF */
+        /* UKRYCIE WIZUALNE SZABLONU PDF DLA CZŁOWIEKA, ALE POZOSTAWIENIE WIDOCZNOŚCI DLA SILNIKA RENDERUJĄCEGO */
+        .pdf-template-container {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            display: block !important;
+            width: 210mm;
+            background: #ffffff;
+        }
         .pdf-page { font-family: 'Montserrat', sans-serif; color: #1c1b1a; padding: 50px; background: #ffffff; }
         .pdf-header { border-bottom: 2px solid #c5a880; padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
         .pdf-title { font-family: 'Cinzel', serif; font-size: 24px; color: #1c1b1a; letter-spacing: 2px; }
@@ -180,7 +188,7 @@
 
     </div>
 
-    <div id="pdfTemplate" style="display: none;">
+    <div id="pdfTemplate" class="pdf-template-container">
         <div class="pdf-page">
             <div class="pdf-header">
                 <div class="pdf-title">AI Color Atelier</div>
@@ -214,7 +222,7 @@
         
         let selectedEngine = 'fusion';
         let compressedBase64 = null;
-        let globalLastApiData = null; // Zmienna cache na potrzeby generatora PDF
+        let globalLastApiData = null;
 
         function setEngine(engine) {
             selectedEngine = engine;
@@ -340,7 +348,7 @@
                 if (!response.ok) throw new Error("Odrzucono połączenie produkcyjne.");
                 
                 const apiData = await response.json();
-                globalLastApiData = apiData; // Zapisujemy surowy zrzut danych z Claude do cache PDF
+                globalLastApiData = apiData; 
                 
                 loader.style.display = 'none';
                 submitBtn.disabled = false;
@@ -429,10 +437,6 @@
             results.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // ==========================================
-        // NOWOŚĆ: BEZPIECZNY GENERATOR DYNAMICZNEGO PDF BEZ PAYWALLA
-        // Ochrona przed XSS zachowana przez dynamiczne mapowanie textContent
-        // ==========================================
         function generateSecurePDF() {
             if (!globalLastApiData) {
                 alert("Błąd: Brak danych wejściowych do wygenerowania paszportu.");
@@ -443,14 +447,12 @@
             btn.innerText = "GENEROWANIE PASZPORTU...";
             btn.disabled = true;
 
-            // 1. Mapowanie danych do ukrytego szablonu przy zachowaniu pełnego bezpieczeństwa textContent
             document.getElementById('pdfSeason').textContent = globalLastApiData.identified_season ? globalLastApiData.identified_season.replace(/_/g, ' ') : "---";
             document.getElementById('pdfMode').textContent = `TRYB EKSTRAKCJI: ${globalLastApiData.engine_mode ? globalLastApiData.engine_mode.toUpperCase() : "FUSION"}`;
             document.getElementById('pdfReportText').textContent = globalLastApiData.ai_generated_report || "Brak danych.";
 
-            // 2. Bezpieczne strukturyzowanie kontekstu reguł wiedzy
             const dumpContainer = document.getElementById('pdfRulesDump');
-            dumpContainer.innerHTML = ''; // Bezpieczne czyszczenie izolowanego węzła
+            dumpContainer.innerHTML = ''; 
 
             let ctx = {};
             try {
@@ -459,7 +461,6 @@
                 ctx = globalLastApiData.knowledge_context || {}; 
             }
 
-            // Agregacja reguł z obiektów i wstrzykiwanie bezpieczną metodą tekstową
             const allRules = { ...ctx.kalisz_science_rules, ...ctx.caygill_art_rules, ...ctx.spillane_practical_rules };
             for (const [k, v] of Object.entries(allRules)) {
                 const ruleRow = document.createElement('p');
@@ -475,9 +476,7 @@
                 dumpContainer.appendChild(ruleRow);
             }
 
-            // 3. Konfiguracja i uruchomienie silnika html2pdf
             const element = document.getElementById('pdfTemplate');
-            element.style.display = 'block'; // Tymczasowe włączenie widoczności dla silnika renderującego
 
             const options = {
                 margin:       10,
@@ -487,14 +486,11 @@
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Wywołanie asynchronicznej obietnicy (Promise) zapisu pliku
             html2pdf().set(options).from(element).save().then(() => {
-                element.style.display = 'none'; // Ponowne ukrycie szablonu
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
                 btn.disabled = false;
             }).catch(err => {
                 console.error("PDF Engine Error:", err);
-                element.style.display = 'none';
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
                 btn.disabled = false;
                 alert("Wystąpił błąd silnika PDF podczas generowania pliku.");
