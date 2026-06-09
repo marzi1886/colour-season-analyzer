@@ -337,10 +337,11 @@
                 document.body.classList.add(`theme-${apiData.identified_season.toLowerCase()}`);
             }
 
-            // 2. Wstrzykiwanie głównych danych: Typ urody, Tryb oraz Esej od Claude AI
-            document.getElementById('displaySeasonName').innerText = apiData.identified_season.replace(/_/g, ' ');
-            document.getElementById('displayEngineMode').innerText = `Tryb analizy: ${apiData.engine_mode.toUpperCase()}`;
-            document.getElementById('aiGeneratedText').innerText = apiData.ai_generated_report || "Brak danych raportu.";
+            // 2. BEZPIECZNE wstrzykiwanie głównych danych przez textContent (Zamiast innerHTML/innerText)
+            // Ochrona przed XSS: przeglądarka potraktuje to wyłącznie jako tekst, nie kod skryptu
+            document.getElementById('displaySeasonName').textContent = apiData.identified_season ? apiData.identified_season.replace(/_/g, ' ') : "...";
+            document.getElementById('displayEngineMode').textContent = `Tryb analizy: ${apiData.engine_mode ? apiData.engine_mode.toUpperCase() : "FUZJA METODOLOGII"}`;
+            document.getElementById('aiGeneratedText').textContent = apiData.ai_generated_report || "Brak danych raportu.";
 
             // 3. Parsowanie kontekstu wiedzy
             let ctx = {};
@@ -354,36 +355,53 @@
             const factsCaygill = document.getElementById('factsCaygill');
             const factsSpillane = document.getElementById('factsSpillane');
             
+            // Czyszczenie poprzednich wyników przed nowym renderowaniem
             if (factsKalisz) factsKalisz.innerHTML = ''; 
             if (factsCaygill) factsCaygill.innerHTML = ''; 
             if (factsSpillane) factsSpillane.innerHTML = '';
 
-            // --- RENDER KOLUMNY 1: Kalisz Science ---
+            // Uniwersalna funkcja pomocnicza do bezpiecznego tworzenia elementów DOM (Brak podatności na wstrzykiwanie kodu)
+            function appendSecureFact(container, key, value) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'fact-item';
+                
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'fact-label';
+                labelSpan.textContent = key.replace(/_/g, ' '); // Bezpieczny tekst składowy nagłówka
+                
+                const textValue = document.createTextNode(value); // Bezpieczny literał tekstowy wartości reguły
+                
+                itemDiv.appendChild(labelSpan);
+                itemDiv.appendChild(textValue);
+                container.appendChild(itemDiv);
+            }
+
+            // --- BEZPIECZNY RENDER KOLUMNY 1: Kalisz Science ---
             if (ctx.kalisz_science_rules && selectedEngine !== 'caygill_art' && selectedEngine !== 'spillane_practical') {
                 document.getElementById('cardKalisz').style.display = 'block';
                 for (const [key, val] of Object.entries(ctx.kalisz_science_rules)) {
-                    factsKalisz.innerHTML += `<div class="fact-item"><span class="fact-label">${key.replace(/_/g, ' ')}</span>${val}</div>`;
+                    appendSecureFact(factsKalisz, key, val);
                 }
             } else { 
                 if (document.getElementById('cardKalisz')) document.getElementById('cardKalisz').style.display = 'none'; 
             }
 
-            // --- RENDER KOLUMNY 2: Caygill Art ---
+            // --- BEZPIECZNY RENDER KOLUMNY 2: Caygill Art ---
             if (ctx.caygill_art_rules && selectedEngine !== 'kalisz_science' && selectedEngine !== 'spillane_practical') {
                 document.getElementById('cardCaygill').style.display = 'block';
                 for (const [key, val] of Object.entries(ctx.caygill_art_rules)) {
-                    factsCaygill.innerHTML += `<div class="fact-item"><span class="fact-label">${key.replace(/_/g, ' ')}</span>${val}</div>`;
+                    appendSecureFact(factsCaygill, key, val);
                 }
             } else { 
                 if (document.getElementById('cardCaygill')) document.getElementById('cardCaygill').style.display = 'none'; 
             }
 
-            // --- RENDER KOLUMNY 3: Spillane Practical ---
+            // --- BEZPIECZNY RENDER KOLUMNY 3: Spillane Practical ---
             if (ctx.spillane_practical_rules && selectedEngine !== 'kalisz_science' && selectedEngine !== 'caygill_art') {
                 document.getElementById('cardSpillane').style.display = 'block';
                 for (const [key, val] of Object.entries(ctx.spillane_practical_rules)) {
                     const displayVal = Array.isArray(val) ? val.join(', ') : val;
-                    factsSpillane.innerHTML += `<div class="fact-item"><span class="fact-label">${key.replace(/_/g, ' ')}</span>${displayVal}</div>`;
+                    appendSecureFact(factsSpillane, key, displayVal);
                 }
             } else { 
                 if (document.getElementById('cardSpillane')) document.getElementById('cardSpillane').style.display = 'none'; 
