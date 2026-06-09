@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=400;600;700&family=Montserrat:wght=300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
             --bg-primary: #fcfbfa;
@@ -90,6 +92,14 @@
 
         .loader { display: none; margin: 30px auto; border: 2px solid #f3f3f3; border-top: 2px solid var(--text-primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* TEKSTURA I STYLE UKRYTEGO SZABLONU PDF */
+        .pdf-page { font-family: 'Montserrat', sans-serif; color: #1c1b1a; padding: 50px; background: #ffffff; }
+        .pdf-header { border-bottom: 2px solid #c5a880; padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
+        .pdf-title { font-family: 'Cinzel', serif; font-size: 24px; color: #1c1b1a; letter-spacing: 2px; }
+        .pdf-section { margin-bottom: 25px; background: #faf9f6; padding: 25px; border-left: 4px solid #c5a880; page-break-inside: avoid; }
+        .pdf-section h4 { font-family: 'Cinzel', serif; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: #1c1b1a; }
+        .pdf-footer { margin-top: 50px; font-size: 10px; text-align: center; color: #7c7a77; border-top: 1px solid #eae8e5; padding-top: 15px; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -156,18 +166,47 @@
             </div>
 
             <div class="paywall-container">
-                <div class="paywall-title">Generuj Osobisty Paszport Kolorystyczny PDF</div>
-                <div class="paywall-desc">Odblokuj kompletne, 15-stronicowe kompendium stylu w formacie PDF. Zawiera pełną szafę kapsułową na 4 pory roku, dedykowane palety makijażowe (kody marek Premium) oraz indywidualne tekstury materiałów.</div>
+                <div class="paywall-title" id="downloadTitle">Generuj Osobisty Paszport Kolorystyczny PDF</div>
+                <div class="paywall-desc">Twój Paszport Kolorystyczny Haute Couture jest gotowy. Zawiera pełną analizę typu urody, wytyczne metodologiczne oraz dedykowane palety barw wyekstrahowane przez model AI.</div>
                 <div class="paywall-features">
-                    <span><i class="fa-solid fa-circle-check"></i> Ponad 120 zestawów ubrań</span>
-                    <span><i class="fa-solid fa-circle-check"></i> Autorski Lookbook</span>
-                    <span><i class="fa-solid fa-circle-check"></i> Certyfikat Autentyczności</span>
+                    <span><i class="fa-solid fa-circle-check"></i> Pełny Raport Claude AI</span>
+                    <span><i class="fa-solid fa-circle-check"></i> Reguły projektowe w PDF</span>
+                    <span><i class="fa-solid fa-circle-check"></i> Oficjalny Certyfikat</span>
                 </div>
-                <button class="premium-btn" onclick="alert('Integracja z bramką Stripe w toku... Przygotuj kartę kredytową na premierę!')">Pobierz Pełny Paszport za 49 PLN</button>
+                <button class="premium-btn" id="downloadPdfBtn" onclick="generateSecurePDF()">Pobierz Paszport PDF (Free Demo)</button>
             </div>
 
         </div>
 
+    </div>
+
+    <div id="pdfTemplate" style="display: none;">
+        <div class="pdf-page">
+            <div class="pdf-header">
+                <div class="pdf-title">AI Color Atelier</div>
+                <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #7c7a77; margin-top: 5px;">Oficjalny Paszport Kolorystyczny Haute Couture</div>
+            </div>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: #7c7a77; display: block; margin-bottom: 5px;">Zidentyfikowany Sezon Kolorystyczny:</span>
+                <h2 id="pdfSeason" style="font-family: 'Cinzel', serif; font-size: 32px; color: #1c1b1a; letter-spacing: 2px;">---</h2>
+                <div id="pdfMode" style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; color: #c5a880;">---</div>
+            </div>
+
+            <div class="pdf-section">
+                <h4>I. Indywidualne Studium Kolorystyczne (Claude AI Analysis)</h4>
+                <p id="pdfReportText" style="font-size: 12px; line-height: 1.8; color: #1c1b1a; white-space: pre-line; text-align: justify;"></p>
+            </div>
+
+            <div class="pdf-section">
+                <h4>II. Zdekonstruowane Reguły Techniczne</h4>
+                <div id="pdfRulesDump" style="font-size: 11px; line-height: 1.6; color: #4a4947;"></div>
+            </div>
+
+            <div class="pdf-footer">
+                Certyfikat Autentyczności AI Color Atelier 2026 | marzi1886.github.io
+            </div>
+        </div>
     </div>
 
     <script>
@@ -175,6 +214,7 @@
         
         let selectedEngine = 'fusion';
         let compressedBase64 = null;
+        let globalLastApiData = null; // Zmienna cache na potrzeby generatora PDF
 
         function setEngine(engine) {
             selectedEngine = engine;
@@ -190,22 +230,14 @@
             const file = input.files[0];
             const statusText = document.getElementById('uploadStatusText');
 
-            // ==========================================
-            // WARSTWA OBRONY 1: Bezwzględny limit rozmiaru (5 MB)
-            // Zapobiega atakom DoS i zamrażaniu pamięci przeglądarki
-            // ==========================================
-            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+            const MAX_FILE_SIZE = 5 * 1024 * 1024; 
             if (file.size > MAX_FILE_SIZE) {
                 alert("BŁĄD BEZPIECZEŃSTWA: Plik jest zbyt duży. Maksymalny rozmiar to 5MB.");
-                input.value = ''; // Reset inputu
+                input.value = ''; 
                 compressedBase64 = null;
                 return;
             }
 
-            // ==========================================
-            // WARSTWA OBRONY 2: Rygorystyczna walidacja rozszerzenia i typu MIME
-            // Ochrona przed plikami wykonywalnymi maskowanymi jako zdjęcia
-            // ==========================================
             const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
             if (!allowedExtensions.exec(file.name)) {
                 alert("BŁĄD BEZPIECZEŃSTWA: Niedozwolone rozszerzenie pliku. Dozwolone: JPG, JPEG, PNG, WEBP.");
@@ -234,9 +266,6 @@
             reader.onload = function(e) {
                 const img = new Image();
                 
-                // ==========================================
-                // WARSTWA OBRONY 3: Ochrona przed Pixel Bomb (Decompression Bomb)
-                // ==========================================
                 img.onerror = function() {
                     alert("BŁĄD BEZPIECZEŃSTWA: Plik nagłówkowy uszkodzony lub wykryto ukrytą zawartość niebędącą obrazem.");
                     statusText.innerText = "BŁĄD WALIDACJI STRUKTURY";
@@ -272,9 +301,6 @@
                         return;
                     }
 
-                    // ==========================================
-                    // WARSTWA OBRONY 4: Sanitarnizacja obrazu (czyszczenie EXIF i skryptów)
-                    // ==========================================
                     ctx.drawImage(img, 0, 0, width, height);
                     
                     compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
@@ -314,6 +340,8 @@
                 if (!response.ok) throw new Error("Odrzucono połączenie produkcyjne.");
                 
                 const apiData = await response.json();
+                globalLastApiData = apiData; // Zapisujemy surowy zrzut danych z Claude do cache PDF
+                
                 loader.style.display = 'none';
                 submitBtn.disabled = false;
                 
@@ -331,19 +359,15 @@
             const results = document.getElementById('resultsSection');
             results.style.display = 'block';
 
-            // 1. Dynamiczne przełączanie luksusowych motywów kolorystycznych CSS
             document.body.className = ''; 
             if (apiData.identified_season) {
                 document.body.classList.add(`theme-${apiData.identified_season.toLowerCase()}`);
             }
 
-            // 2. BEZPIECZNE wstrzykiwanie głównych danych przez textContent (Zamiast innerHTML/innerText)
-            // Ochrona przed XSS: przeglądarka potraktuje to wyłącznie jako tekst, nie kod skryptu
             document.getElementById('displaySeasonName').textContent = apiData.identified_season ? apiData.identified_season.replace(/_/g, ' ') : "...";
             document.getElementById('displayEngineMode').textContent = `Tryb analizy: ${apiData.engine_mode ? apiData.engine_mode.toUpperCase() : "FUZJA METODOLOGII"}`;
             document.getElementById('aiGeneratedText').textContent = apiData.ai_generated_report || "Brak danych raportu.";
 
-            // 3. Parsowanie kontekstu wiedzy
             let ctx = {};
             try {
                 ctx = typeof apiData.knowledge_context === 'string' ? JSON.parse(apiData.knowledge_context) : apiData.knowledge_context;
@@ -355,28 +379,25 @@
             const factsCaygill = document.getElementById('factsCaygill');
             const factsSpillane = document.getElementById('factsSpillane');
             
-            // Czyszczenie poprzednich wyników przed nowym renderowaniem
             if (factsKalisz) factsKalisz.innerHTML = ''; 
             if (factsCaygill) factsCaygill.innerHTML = ''; 
             if (factsSpillane) factsSpillane.innerHTML = '';
 
-            // Uniwersalna funkcja pomocnicza do bezpiecznego tworzenia elementów DOM (Brak podatności na wstrzykiwanie kodu)
             function appendSecureFact(container, key, value) {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'fact-item';
                 
                 const labelSpan = document.createElement('span');
                 labelSpan.className = 'fact-label';
-                labelSpan.textContent = key.replace(/_/g, ' '); // Bezpieczny tekst składowy nagłówka
+                labelSpan.textContent = key.replace(/_/g, ' '); 
                 
-                const textValue = document.createTextNode(value); // Bezpieczny literał tekstowy wartości reguły
+                const textValue = document.createTextNode(value); 
                 
                 itemDiv.appendChild(labelSpan);
                 itemDiv.appendChild(textValue);
                 container.appendChild(itemDiv);
             }
 
-            // --- BEZPIECZNY RENDER KOLUMNY 1: Kalisz Science ---
             if (ctx.kalisz_science_rules && selectedEngine !== 'caygill_art' && selectedEngine !== 'spillane_practical') {
                 document.getElementById('cardKalisz').style.display = 'block';
                 for (const [key, val] of Object.entries(ctx.kalisz_science_rules)) {
@@ -386,7 +407,6 @@
                 if (document.getElementById('cardKalisz')) document.getElementById('cardKalisz').style.display = 'none'; 
             }
 
-            // --- BEZPIECZNY RENDER KOLUMNY 2: Caygill Art ---
             if (ctx.caygill_art_rules && selectedEngine !== 'kalisz_science' && selectedEngine !== 'spillane_practical') {
                 document.getElementById('cardCaygill').style.display = 'block';
                 for (const [key, val] of Object.entries(ctx.caygill_art_rules)) {
@@ -396,7 +416,6 @@
                 if (document.getElementById('cardCaygill')) document.getElementById('cardCaygill').style.display = 'none'; 
             }
 
-            // --- BEZPIECZNY RENDER KOLUMNY 3: Spillane Practical ---
             if (ctx.spillane_practical_rules && selectedEngine !== 'kalisz_science' && selectedEngine !== 'caygill_art') {
                 document.getElementById('cardSpillane').style.display = 'block';
                 for (const [key, val] of Object.entries(ctx.spillane_practical_rules)) {
@@ -408,6 +427,78 @@
             }
 
             results.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // NOWOŚĆ: BEZPIECZNY GENERATOR DYNAMICZNEGO PDF BEZ PAYWALLA
+        // Ochrona przed XSS zachowana przez dynamiczne mapowanie textContent
+        // ==========================================
+        function generateSecurePDF() {
+            if (!globalLastApiData) {
+                alert("Błąd: Brak danych wejściowych do wygenerowania paszportu.");
+                return;
+            }
+
+            const btn = document.getElementById('downloadPdfBtn');
+            btn.innerText = "GENEROWANIE PASZPORTU...";
+            btn.disabled = true;
+
+            // 1. Mapowanie danych do ukrytego szablonu przy zachowaniu pełnego bezpieczeństwa textContent
+            document.getElementById('pdfSeason').textContent = globalLastApiData.identified_season ? globalLastApiData.identified_season.replace(/_/g, ' ') : "---";
+            document.getElementById('pdfMode').textContent = `TRYB EKSTRAKCJI: ${globalLastApiData.engine_mode ? globalLastApiData.engine_mode.toUpperCase() : "FUSION"}`;
+            document.getElementById('pdfReportText').textContent = globalLastApiData.ai_generated_report || "Brak danych.";
+
+            // 2. Bezpieczne strukturyzowanie kontekstu reguł wiedzy
+            const dumpContainer = document.getElementById('pdfRulesDump');
+            dumpContainer.innerHTML = ''; // Bezpieczne czyszczenie izolowanego węzła
+
+            let ctx = {};
+            try {
+                ctx = typeof globalLastApiData.knowledge_context === 'string' ? JSON.parse(globalLastApiData.knowledge_context) : globalLastApiData.knowledge_context;
+            } catch(e) { 
+                ctx = globalLastApiData.knowledge_context || {}; 
+            }
+
+            // Agregacja reguł z obiektów i wstrzykiwanie bezpieczną metodą tekstową
+            const allRules = { ...ctx.kalisz_science_rules, ...ctx.caygill_art_rules, ...ctx.spillane_practical_rules };
+            for (const [k, v] of Object.entries(allRules)) {
+                const ruleRow = document.createElement('p');
+                ruleRow.style.marginBottom = '6px';
+                
+                const boldKey = document.createElement('strong');
+                boldKey.textContent = `${k.replace(/_/g, ' ').toUpperCase()}: `;
+                
+                const textVal = document.createTextNode(Array.isArray(v) ? v.join(', ') : v);
+                
+                ruleRow.appendChild(boldKey);
+                ruleRow.appendChild(textVal);
+                dumpContainer.appendChild(ruleRow);
+            }
+
+            // 3. Konfiguracja i uruchomienie silnika html2pdf
+            const element = document.getElementById('pdfTemplate');
+            element.style.display = 'block'; // Tymczasowe włączenie widoczności dla silnika renderującego
+
+            const options = {
+                margin:       10,
+                filename:     `Paszport_Kolorystyczny_${globalLastApiData.identified_season || 'Atelier'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, logging: false, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Wywołanie asynchronicznej obietnicy (Promise) zapisu pliku
+            html2pdf().set(options).from(element).save().then(() => {
+                element.style.display = 'none'; // Ponowne ukrycie szablonu
+                btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
+                btn.disabled = false;
+            }).catch(err => {
+                console.error("PDF Engine Error:", err);
+                element.style.display = 'none';
+                btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
+                btn.disabled = false;
+                alert("Wystąpił błąd silnika PDF podczas generowania pliku.");
+            });
         }
     </script>
 </body>
