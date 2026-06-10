@@ -393,8 +393,8 @@
         }
 
         // =========================================================================
-        // EXPERT FIX: BEZPIECZNE GENEROWANIE PDF PRZEZ PIASKOWNICĘ OFF-SCREEN
-        // Rozwiązuje problem pustych stron (brak renderu elementów in-memory)
+        // EXPERT FIX V6.0: EMULACJA LAYOUTU KAMELEONA (Z PEŁNYM BOGACTWEM DANYCH)
+        // Podmienia dynamicznie bogate dane i dodaje twarde formatowanie w bezpiecznym wątku
         // =========================================================================
         function generateSecurePDF() {
             if (!globalLastApiData) {
@@ -406,7 +406,7 @@
             btn.innerText = "GENEROWANIE PASZPORTU...";
             btn.disabled = true;
 
-            // 1. Bezpieczna dezynfekcja i parsowanie kontekstu danych (String vs Object z n8n)
+            // 1. Dekodowanie kontekstu wiedzy (Parsowanie JSON ze stringa lub obiektu)
             let parsedCtx = {};
             try {
                 if (globalLastApiData.knowledge_context) {
@@ -415,11 +415,11 @@
                         : globalLastApiData.knowledge_context;
                 }
             } catch(e) {
-                console.error("Błąd parsowania kontekstu wiedzy:", e);
+                console.error("Błąd parsowania:", e);
                 parsedCtx = {};
             }
 
-            // 2. Budowanie struktury reguł technicznych
+            // 2. Budowanie pełnej bazy reguł technicznych (zbiera komplet danych)
             let technicalRulesHtml = '';
             const allRules = { 
                 ...(parsedCtx.kalisz_science_rules || {}), 
@@ -428,12 +428,12 @@
             };
 
             if (Object.keys(allRules).length === 0) {
-                technicalRulesHtml = '<p style="font-size:11px; color:#7c7a77; font-family:Arial, sans-serif;">Brak szczegółowych reguł technicznych w tym trybie analizy.</p>';
+                technicalRulesHtml = '<p style="font-size:11px; color:#7c7a77; font-family: Arial, sans-serif;">Brak szczegółowych reguł technicznych.</p>';
             } else {
                 for (const [key, val] of Object.entries(allRules)) {
                     const displayValue = Array.isArray(val) ? val.join(', ') : val;
                     technicalRulesHtml += `
-                        <p style="margin-bottom: 6px; font-size: 11px; line-height: 1.5; font-family:Arial, sans-serif;">
+                        <p style="margin-bottom: 6px; font-size: 11px; line-height: 1.5; font-family: Arial, sans-serif;">
                             <strong style="text-transform: uppercase; color: #1c1b1a;">${key.replace(/_/g, ' ')}:</strong> 
                             <span style="color: #4a4947;">${displayValue}</span>
                         </p>
@@ -443,23 +443,30 @@
 
             const seasonName = globalLastApiData.identified_season ? globalLastApiData.identified_season.replace(/_/g, ' ') : "---";
             const engineMode = globalLastApiData.engine_mode ? globalLastApiData.engine_mode.toUpperCase() : "FUSION";
+            
+            // TU MOŻESZ DOPISAĆ WIĘCEJ DANYCH (Wyciągamy surowy pełny tekst z silnika)
             const reportText = globalLastApiData.ai_generated_report || "Brak danych raportu.";
 
-            // 3. Budowanie kontenera i wymuszenie twardych fontów systemowych (Arial / Georgia) zabezpieczających przed pustym renderem html2canvas
+            // 3. BUDOWANIE NIEWIDOCZNEJ PIASKOWNICY Z PEŁNYMI STYLAMI INLINE (Brak zależności od CSS zewnętrznego)
             const pdfWrapper = document.createElement('div');
             pdfWrapper.id = "secure-pdf-sandbox";
-            pdfWrapper.style.position = "absolute";
+            
+            // Te cztery linie to pancerne zabezpieczenie przed blank page - element jest fizyczny, ale przesunięty
+            pdfWrapper.style.position = "fixed";
             pdfWrapper.style.left = "-9999px";
             pdfWrapper.style.top = "0";
             pdfWrapper.style.width = "750px";
+            pdfWrapper.style.zIndex = "-9999";
+            
+            // Wygląd karty paszportowej
             pdfWrapper.style.background = "#ffffff";
             pdfWrapper.style.color = "#1c1b1a";
             pdfWrapper.style.padding = "40px";
-            pdfWrapper.style.fontFamily = "Arial, sans-serif"; // Globalny bezpieczny fallback
+            pdfWrapper.style.fontFamily = "Arial, sans-serif";
 
             pdfWrapper.innerHTML = `
                 <div style="border-bottom: 2px solid #c5a880; padding-bottom: 15px; margin-bottom: 30px; text-align: center;">
-                    <h1 style="font-family: Georgia, serif; font-size: 26px; letter-spacing: 2px; margin: 0 0 5px 0;">AI Color Atelier</h1>
+                    <h1 style="font-family: Georgia, serif; font-size: 26px; letter-spacing: 2px; margin: 0 0 5px 0; color: #1c1b1a;">AI Color Atelier</h1>
                     <div style="font-size: 9px; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: 2px; color: #7c7a77;">Oficjalny Paszport Kolorystyczny Haute Couture</div>
                 </div>
 
@@ -469,22 +476,22 @@
                     <div style="font-size: 9px; font-family: Arial, sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; color: #c5a880;">TRYB EKSTRAKCJI: ${engineMode}</div>
                 </div>
 
-                <div style="margin-bottom: 25px; background: #faf9f6; padding: 20px; border-left: 4px solid #c5a880;">
-                    <h4 style="font-family: Georgia, serif; font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 1px;">I. Indywidualne Studium Kolorystyczne (Claude AI Analysis)</h4>
+                <div style="margin-bottom: 25px; background: #faf9f6; padding: 20px; border-left: 4px solid #c5a880; border-top: 1px solid #eae8e5; border-right: 1px solid #eae8e5; border-bottom: 1px solid #eae8e5;">
+                    <h4 style="font-family: Georgia, serif; font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 1px; color: #1c1b1a;">I. Indywidualne Studium Kolorystyczne (Pełny Raport Claude AI)</h4>
                     <p style="font-size: 11px; font-family: Arial, sans-serif; line-height: 1.7; text-align: justify; white-space: pre-line; margin: 0; color: #1c1b1a;">${reportText}</p>
                 </div>
 
-                <div style="margin-bottom: 25px; background: #faf9f6; padding: 20px; border-left: 4px solid #c5a880;">
-                    <h4 style="font-family: Georgia, serif; font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 1px;">II. Zdekonstruowane Reguły Techniczne</h4>
+                <div style="margin-bottom: 25px; background: #faf9f6; padding: 20px; border-left: 4px solid #c5a880; border-top: 1px solid #eae8e5; border-right: 1px solid #eae8e5; border-bottom: 1px solid #eae8e5;">
+                    <h4 style="font-family: Georgia, serif; font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 1px; color: #1c1b1a;">II. Zdekonstruowane Reguły Techniczne i Baza Wiedzy</h4>
                     <div>${technicalRulesHtml}</div>
                 </div>
 
-                <div style="margin-top: 50px; font-size: 9px; font-family: Arial, sans-serif; text-align: center; color: #7c7a77; border-top: 1px solid #eae8e5; padding-top: 15px; text-transform: uppercase; letter-spacing: 2px;">
+                <div style="margin-top: 60px; font-size: 9px; font-family: Arial, sans-serif; text-align: center; color: #7c7a77; border-top: 1px solid #eae8e5; padding-top: 15px; text-transform: uppercase; letter-spacing: 2px;">
                     Certyfikat Autentyczności AI Color Atelier 2026 | marzi1886.github.io
                 </div>
             `;
 
-            // 4. Krytyczne dołączenie do aktywnego drzewa DOM (wymagane przez html2canvas do wyliczenia wysokości/szerokości bloków)
+            // Wstrzykujemy fizycznie do drzewa DOM, dając przeglądarce pełną widoczność kodu i wymiarów
             document.body.appendChild(pdfWrapper);
 
             const options = {
@@ -499,24 +506,26 @@
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 5. Generowanie dokumentu i bezwzględne sprzątanie DOM (Gwarancja wykonania bloku w obu przypadkach)
-            html2pdf().set(options).from(pdfWrapper).save()
-                .then(() => {
-                    if (pdfWrapper.parentNode) {
-                        document.body.removeChild(pdfWrapper);
-                    }
-                    btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
-                    btn.disabled = false;
-                })
-                .catch(err => {
-                    console.error("Błąd krytyczny generowania PDF:", err);
-                    if (pdfWrapper.parentNode) {
-                        document.body.removeChild(pdfWrapper);
-                    }
-                    btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
-                    btn.disabled = false;
-                    alert("Wystąpił błąd silnika PDF podczas generowania pliku.");
-                });
+            // WYMUSZONY TICK GRAFICZNY: Czekamy 100ms, aż przeglądarka rozpakuje wewnętrzny innerHTML i nada mu wymiary fizyczne
+            setTimeout(() => {
+                html2pdf().set(options).from(pdfWrapper).save()
+                    .then(() => {
+                        if (pdfWrapper.parentNode) {
+                            document.body.removeChild(pdfWrapper);
+                        }
+                        btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
+                        btn.disabled = false;
+                    })
+                    .catch(err => {
+                        console.error("Krytyczny błąd generowania pliku:", err);
+                        if (pdfWrapper.parentNode) {
+                            document.body.removeChild(pdfWrapper);
+                        }
+                        btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
+                        btn.disabled = false;
+                        alert("Wystąpił błąd silnika PDF.");
+                    });
+            }, 100);
         }
     </script>
 </body>
