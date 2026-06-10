@@ -64,13 +64,13 @@
         }
         .workspace-frame:hover { background-color: #f4f2ee; }
         
-        /* WEWNĘTRZNY PORTRET (W STYLU IKONY ATELIER) — POPRAWIONY NA CIEŃSZĄ OBRĘCZ */
+        /* WEWNĘTRZNY PORTRET (W STYLU IKONY ATELIER) — USUNIĘTO BIAŁY OKRĄG */
         .preview-avatar {
             width: 240px;
             height: 240px;
             border-radius: 50%;
-            border: 3px solid #ffffff; /* Zmniejszone z 6px na 3px dla elegancji */
-            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+            border: none; /* Całkowicie usunięta biała obwódka */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Subtelniejszy cień, by stopić zdjęcie z tłem */
             object-fit: cover;
             display: none;
             z-index: 2;
@@ -152,7 +152,6 @@
             <h2>Rozpocznij Analizę Wizyjną</h2>
             <div class="brand-subtitle" style="margin-bottom: 20px;">Wprowadź próbkę portretową wysokiej rozdzielczości</div>
 
-            <!-- INTERAKTYWNA RAMA Z AVATAREM -->
             <div class="workspace-frame" id="workspaceFrame" onclick="document.getElementById('fileInput').click()">
                 <div class="upload-placeholder" id="uploadPlaceholder">
                     <i class="fa-solid fa-camera" style="font-size: 2.2rem; color: var(--accent-gold); margin-bottom: 12px; display: block;"></i>
