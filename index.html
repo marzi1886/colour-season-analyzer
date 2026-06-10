@@ -393,8 +393,8 @@
         }
 
         // =========================================================================
-        // EXPERT FIX: GENEROWANIE PDF CAŁKOWICIE W PAMIĘCI RAM (IN-MEMORY DOM CONSTRUCT)
-        // Omija blokady renderowania niewidocznych elementów i culling przeglądarki
+        // EXPERT FIX: BEZPIECZNE GENEROWANIE PDF PRZEZ PIASKOWNICĘ OFF-SCREEN
+        // Rozwiązuje problem pustych stron (brak renderu elementów in-memory)
         // =========================================================================
         function generateSecurePDF() {
             if (!globalLastApiData) {
@@ -406,13 +406,18 @@
             btn.innerText = "GENEROWANIE PASZPORTU...";
             btn.disabled = true;
 
-            // 1. Dynamiczne tworzenie kontenera w pamięci wirtualnej (Nie jest podpięty pod ukryte drzewo CSS)
+            // 1. Dynamiczne tworzenie kontenera
             const pdfWrapper = document.createElement('div');
             pdfWrapper.style.fontFamily = "'Montserrat', sans-serif";
             pdfWrapper.style.color = "#1c1b1a";
             pdfWrapper.style.padding = "40px";
             pdfWrapper.style.background = "#ffffff";
-            pdfWrapper.style.width = "100%";
+            
+            // CRITICAL FIX: Stylizujemy kontener jako element off-screen (niewidoczny dla oka, widoczny dla html2canvas)
+            pdfWrapper.style.position = "absolute";
+            pdfWrapper.style.left = "-9999px";
+            pdfWrapper.style.top = "0";
+            pdfWrapper.style.width = "800px"; // Sztywna szerokość optymalna dla formatu A4
 
             // Nagłówek dokumentu
             const headerDiv = document.createElement('div');
@@ -545,7 +550,10 @@
             footerDiv.textContent = "Certyfikat Autentyczności AI Color Atelier 2026 | marzi1886.github.io";
             pdfWrapper.appendChild(footerDiv);
 
-            // 2. Konfiguracja i uruchomienie natychmiastowego eksportu ze struktury In-Memory
+            // CRITICAL FIX: Wstrzykujemy element do prawdziwego drzewa DOM
+            document.body.appendChild(pdfWrapper);
+
+            // 2. Konfiguracja i uruchomienie natychmiastowego eksportu ze struktury DOM
             const options = {
                 margin:       10,
                 filename:     `Paszport_Kolorystyczny_${globalLastApiData.identified_season || 'Atelier'}.pdf`,
@@ -554,12 +562,16 @@
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Wywołanie silnika PDF bezpośrednio na obiekcie utworzonym w RAM - przeglądarka nie ma możliwości zrzucić lub wyczyścić zawartości!
+            // Wywołanie silnika PDF na obiekcie wstrzykniętym w strukturę DOM
             html2pdf().set(options).from(pdfWrapper).save().then(() => {
+                document.body.removeChild(pdfWrapper); // Czyszczenie DOM po renderze
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
                 btn.disabled = false;
             }).catch(err => {
                 console.error("PDF Engine Error:", err);
+                if (pdfWrapper.parentNode) {
+                    document.body.removeChild(pdfWrapper);
+                }
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE DEMO)";
                 btn.disabled = false;
                 alert("Wystąpił błąd silnika PDF podczas generowania pliku.");
