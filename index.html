@@ -61,7 +61,7 @@
         /* KOMPONENT QUIZU */
         .quiz-container { display: none; text-align: left; max-width: 600px; margin: 20px auto; }
         .quiz-progress { height: 4px; width: 100%; background: var(--border-color); margin-bottom: 30px; border-radius: 2px; overflow: hidden; }
-        .quiz-progress-bar { height: 100%; width: 25%; background: var(--text-primary); transition: width 0.3s ease; }
+        .quiz-progress-bar { height: 100%; width: 0%; background: var(--text-primary); transition: width 0.3s ease; }
         .quiz-question-title { font-size: 1.15rem; font-weight: 500; margin-bottom: 25px; line-height: 1.4; text-transform: uppercase; letter-spacing: 1px; color: var(--text-primary); }
         .quiz-options-list { display: flex; flex-direction: column; gap: 12px; }
         .quiz-option-btn { background: none; border: 1px solid var(--border-color); padding: 16px 20px; border-radius: 4px; text-align: left; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: space-between; }
@@ -158,8 +158,10 @@
 
     <div class="main-container">
 
+        <!-- KARTA INPUTU -->
         <div class="upload-card" id="inputCard">
             
+            <!-- EKRAN STARTOWY: WYBÓR METODOLOGII -->
             <div id="modeSelectionBlock">
                 <h2>Wybierz Tryb Diagnostyki</h2>
                 <div class="brand-subtitle" style="margin-bottom: 10px;">Dopasuj ścieżkę analizy do swoich preferencji</div>
@@ -172,11 +174,12 @@
                     <div class="selection-box" onclick="initiateFlow('quiz')">
                         <i class="fa-solid fa-clipboard-question"></i>
                         <h3>Wywiad Tonalny</h3>
-                        <p>Odpowiedz na 4 pytania eksperckie dotyczące natury Twoich pigmentów i reakcji na światło.</p>
+                        <p>Odpowiedz na 7 pytań ekspertów dotyczących natury Twoich pigmentów i reakcji na światło.</p>
                     </div>
                 </div>
             </div>
 
+            <!-- BLOK FOTO (UKRYTY DOMYŚLNIE) -->
             <div id="photoFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Rozpocznij Analizę Wizyjną</h2>
@@ -202,6 +205,7 @@
                 <button class="action-btn" id="submitBtn" onclick="runAnalysis()">Uruchom silnik AI</button>
             </div>
 
+            <!-- BLOK QUIZU (UKRYTY DOMYŚLNIE) -->
             <div id="quizFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Ekspercki Wywiad Tonalny</h2>
@@ -219,14 +223,17 @@
             <div class="draping-status-label" id="drapingStatusLabel">Inicjalizacja próbki...</div>
         </div>
 
+        <!-- SEKCJA WYNIKÓW (WARIANT A: TRZY DEDYKOWANE ROZDZIAŁY W JEDNYM RAPORCIE) -->
         <div class="results-section" id="resultsSection">
 
+            <!-- Nagłówek Zgodny z image_c6ea76.png -->
             <div class="verdict-header">
                 <div class="brand-subtitle">Matematyczny Werdykt Silnika</div>
                 <div class="verdict-title" id="displaySeasonName">...</div>
                 <div class="verdict-badge" id="displayEngineMode">Tryb: Fuzja Metodologii</div>
             </div>
 
+            <!-- Podgląd Telemetrii i Barw Zgodny z image_c6ea76.png -->
             <div class="premium-insights-grid">
                 <div class="insight-card">
                     <h3><i class="fa-solid fa-chart-simple" style="margin-right: 10px; color: var(--season-accent);"></i>Parametry Twojej Urody</h3>
@@ -271,6 +278,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 1: SILNIK KALISZ ================= -->
             <div class="report-chapter" id="chapterKalisz">
                 <div class="chapter-badge">Rozdział I</div>
                 <h2><i class="fa-solid fa-flask"></i>Analiza Optyczna i Biochemia Skóry</h2>
@@ -280,6 +288,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 2: SILNIK CAYGILL ================= -->
             <div class="report-chapter" id="chapterCaygill">
                 <div class="chapter-badge">Rozdział II</div>
                 <h2><i class="fa-solid fa-palette"></i>Esencja Twojego Stylu i Archetyp Natury</h2>
@@ -289,6 +298,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 3: SILNIK SPILLANE ================= -->
             <div class="report-chapter" id="chapterSpillane">
                 <div class="chapter-badge">Rozdział III</div>
                 <h2><i class="fa-solid fa-compass-drafting"></i>Twój Przewodnik Zakupowy i Kapsuła</h2>
@@ -297,6 +307,7 @@
                     Budowanie spersonalizowanych reguł zakupowych...
                 </div>
                 
+                <!-- Funkcjonalny komponent przewodnika zakupowego premium -->
                 <div class="shopping-grid">
                     <div class="shopping-box">
                         <h4><i class="fa-solid fa-shirt" style="margin-right: 8px; color: var(--season-accent);"></i>Garderoba Kapsułowa</h4>
@@ -322,6 +333,7 @@
                 </div>
             </div>
 
+            <!-- DOLNY PANEL POBIERANIA PDF -->
             <div class="paywall-container">
                 <div class="paywall-title" id="downloadTitle">Generuj Osobisty Paszport Kolorystyczny PDF</div>
                 <div class="paywall-desc">Pobierz kompletną, luksusową "Encyklopedię Twojej Urody" łączącą 3 światowe metodologie w jednym dokumencie PDF Haute Couture.</div>
@@ -344,41 +356,68 @@
         let globalLastApiData = null;
         let drapesInterval = null;
 
-        // STRUKTURA PYTAŃ DLA ŚCIEŻKI QUIZU
+        // 7 EKSPERCKICH PYTAŃ DIAGNOSTYCZNYCH DLA SYSTEMU 12 TYPÓW
         const QUIZ_QUESTIONS = [
             {
-                question: "Jak Twoja skóra reaguje na ekspozycję słoneczną?",
+                question: "1. Jak Twoja skóra reaguje na ekspozycję słoneczną?",
                 options: [
-                    { text: "Błyskawicznie opala się na brązowo, rzadko ulega poparzeniom", value: "warm_rich" },
-                    { text: "Najpierw opala się na czerwono, wolno przechodzi w złoty odcień", value: "warm_light" },
-                    { text: "Opala się niezwykle ciężko, słońce parzy skórę na różowo", value: "cold_light" },
-                    { text: "Skóra reaguje chłodnym, oliwkowym lub lekko szarym odcieniem opalenizny", value: "cold_deep" }
+                    { text: "Błyskawicznie opala się na brązowo, rzadko ulega poparzeniom", value: "sun_warm_rich" },
+                    { text: "Najpierw opala się na czerwono, wolno przechodzi w złoty odcień", value: "sun_warm_light" },
+                    { text: "Opala się niezwykle ciężko, słońce parzy skórę na czerwono/różowo", value: "sun_cold_light" },
+                    { text: "Skóra reaguje chłodnym, oliwkowym lub neutralno-szarym odcieniem opalenizny", value: "sun_cold_deep" }
                 ]
             },
             {
-                question: "Jaki jest naturalny odcień Twoich ust oraz rumieńca?",
+                question: "2. Jaki jest naturalny odcień Twoich ust oraz rumieńca?",
                 options: [
-                    { text: "Ciepły koral, brzoskwinia, stonowany pomidorowy róż", value: "warm" },
-                    { text: "Chłodny róż, malina, lekko fioletowy lub sinawy podton", value: "cold" },
-                    { text: "Bardzo nasycona, kontrastowa czerwień na tle jasnej karnacji", value: "bright" },
-                    { text: "Zgaszony, stonowany, mało widoczny, zlewający się ze skórą", value: "muted" }
+                    { text: "Ciepły koral, brzoskwinia, łagodny łososiowy lub pomidorowy róż", value: "blush_warm" },
+                    { text: "Chłodny róż, malina, delikatny fioletowy lub sinawy podton ust", value: "blush_cold" },
+                    { text: "Niezwykle nasycona, kontrastowa, soczysta czerwień ust", value: "blush_bright" },
+                    { text: "Zgaszony, przygaszony, stapiający się bezkontrastowo z odcieniem karnacji", value: "blush_muted" }
                 ]
             },
             {
-                question: "Gdy zakładasz biżuterię blisko twarzy, co najbardziej ją rozświetla?",
+                question: "3. Gdy zakładasz biżuterię blisko twarzy, co najbardziej ją rozświetla?",
                 options: [
-                    { text: "Klasyczne, błyszczące, żółte złoto – dodaje zdrowego blasku", value: "gold_bright" },
-                    { text: "Antyczne, matowe złoto lub miedź – idealnie współgra z cerą", value: "gold_matte" },
-                    { text: "Czyste, polerowane srebro lub platyna – skóra wygląda świeżo", value: "silver_bright" },
-                    { text: "Matowe srebro, pewter lub stal szlachetna – dają wyważony efekt", value: "silver_matte" }
+                    { text: "Klasyczne, lśniące, żółte złoto – skóra wygląda zdrowo i promiennie", value: "metal_gold_bright" },
+                    { text: "Matowe, antyczne złoto, miedź lub mosiądz – idealnie harmonizuje z cerą", value: "metal_gold_matte" },
+                    { text: "Czyste, polerowane srebro, platyna lub białe złoto – dodaje cerze świeżości", value: "metal_silver_bright" },
+                    { text: "Matowe srebro, pewter lub stal szczotkowana – daje elegancki, stonowany efekt", value: "metal_silver_matte" }
                 ]
             },
             {
-                question: "Jaki jest poziom naturalnego kontrastu między Twoją cerą, oprawą oczu a włosami?",
+                question: "4. Jak opisałbyś naturalny kolor oraz głębię swoich włosów?",
                 options: [
-                    { text: "Wysoki: Czyste białko oka kontrastuje z ciemną tęczówką i ciemnymi włosami", value: "high" },
-                    { text: "Niski: Wszystkie parametry (włosy, oczy, skóra) są jasne lub harmonijne", value: "low" },
-                    { text: "Średni: Wyraziste oczy, ale stonowana oprawa i naturalny mysi/brązowy odcień", value: "medium" }
+                    { text: "Jasny blond, złoty blond, rudy, ciepły jasny brąz", value: "hair_light_warm" },
+                    { text: "Platynowy blond, mysi blond, popielaty szary brąz", value: "hair_light_cold" },
+                    { text: "Ciemny brąz, miedziany kasztan, głęboki czekoladowy brąz ze złotym błyskiem", value: "hair_dark_warm" },
+                    { text: "Głęboka czerń, czarno-brązowy, ciemny popielaty szorstki brąz", value: "hair_dark_cold" }
+                ]
+            },
+            {
+                question: "5. Przyjrzyj się swojej tęczówce. Jaka jest jej dominująca cecha?",
+                options: [
+                    { text: "Kontrastowa, bardzo czysta (niebieska, zielona, czarna), mocno odcina się od białka", value: "eyes_bright" },
+                    { text: "Stonowana, mglista, wielotonowa (szaro-niebieska, szaro-zielona, piwna)", value: "eyes_soft" },
+                    { text: "Głęboka, ciemna, jednolicie ciemnobrązowa lub czarna", value: "eyes_dark" },
+                    { text: "Jasna, świetlista, o ciepłym miodowym lub czystym lazurowym odcieniu", value: "eyes_clear_light" }
+                ]
+            },
+            {
+                question: "6. Jaki efekt dają na Twojej twarzy czysta czerń oraz śnieżnobiała biel?",
+                options: [
+                    { text: "Wyglądam w nich świetnie, podkreślają moją urodę i dodają elegancji", value: "stark_perfect" },
+                    { text: "Przytłaczają mnie, wyglądam blado, choro i widać pod nimi zmęczenie", value: "stark_overwhelm" },
+                    { text: "Wyglądam poprawnie, ale o wiele lepiej wyglądam w kremowej bieli i brązach", value: "stark_cream" },
+                    { text: "Zdecydowanie wolę grafit i stonowany błękit, czysta czerń jest zbyt surowa", value: "stark_soft" }
+                ]
+            },
+            {
+                question: "7. Jaki jest poziom naturalnego kontrastu między Twoją cerą, oczami a włosami?",
+                options: [
+                    { text: "Wysoki: Bardzo jasna cera i ciemne włosy/oczy (lub bardzo świetliste spojrzenie)", value: "contrast_high" },
+                    { text: "Niski: Wszystkie elementy są zbliżone jasnością (np. cała sylwetka jasna lub cała ciemna)", value: "contrast_low" },
+                    { text: "Średni: Wyważone proporcje, brak skrajności tonalnych", value: "contrast_medium" }
                 ]
             }
         ];
@@ -591,7 +630,6 @@
             const humanReadableSeason = apiData.identified_season ? apiData.identified_season.replace(/_/g, ' ') : "DARK AUTUMN";
             document.getElementById('displaySeasonName').textContent = humanReadableSeason;
             
-            // Określenie trybu na odznace zależnie od wybranej wcześniej ścieżki
             const currentModeText = compressedBase64 ? `Tryb ${selectedEngine.toUpperCase()}` : "Ekspercki Wywiad Tonalny";
             document.getElementById('displayEngineMode').textContent = `Zintegrowany Raport: ${currentModeText}`;
 
@@ -608,7 +646,7 @@
         }
 
         function renderBiometricSliders(apiData, seasonSlug) {
-            let temp = 75, val = 25, chroma = 55, contrast = 80; // Wzorzec Dark Autumn z image_c6ea76.png
+            let temp = 75, val = 25, chroma = 55, contrast = 80; // Wzorzec Dark Autumn
             
             if(apiData.telemetry) {
                 temp = apiData.telemetry.temperature || temp;
@@ -655,11 +693,9 @@
         function distributeReportToChapters(apiData, seasonName) {
             const rawReport = apiData.ai_generated_report || "";
             
-            // Architektura Parsowania: szukamy podziału tekstu lub inteligentnie dzielimy wątki
             let kaliszText = "", caygillText = "", spillaneText = "";
 
             if (rawReport.includes("ANALIZA TECHNICZNA") || rawReport.includes("PIERWSZE WRAŻENIE")) {
-                // Jeśli tekst pochodzi z LLM w formie ustrukturyzowanej, parsujemy sekcje domeny
                 const parts = rawReport.split(/(?=\d\.\s|MAKIJAŻ|STYLING|PALETA)/g);
                 parts.forEach(p => {
                     if(p.includes("PIERWSZE WRAŻENIE") || p.includes("ANALIZA TECHNICZNA")) kaliszText += p;
@@ -668,7 +704,6 @@
                 });
             }
 
-            // Fallback produkcyjny dbający o spójność danych i brak pustych pól na UI
             document.getElementById('contentKalisz').innerHTML = kaliszText ? kaliszText : 
                 `Na podstawie odczytów spektrofotometru optycznego, Twój profil został zaklasyfikowany do podgrupy: ${seasonName}.\n` +
                 `• Dominacja pigmentacji: Skondensowana, o gęstym rozkładzie melanocytów.\n` +
@@ -683,9 +718,8 @@
             document.getElementById('contentSpillane').innerHTML = spillaneText ? spillaneText :
                 `Praktyczny przewodnik zakupowy w oparciu o system 12 typów urody.\n` +
                 `Wybieraj ubrania, które utrzymują wysoki poziom kontrastu naturalnego Twojej twarzy. Unikaj rozmytych, pastelowych szarości blisko twarzy.\n` +
-                (apiData.ai_generated_report ? `\nDedykowane rekomendacje asortymentu:\n${rawReport.substring(900)}` : '');
+                (apiData.ai_generated_report ? `\nDedykowane rekomendacje asorytmentu:\n${rawReport.substring(900)}` : '');
 
-            // Dynamiczne zasilanie elementów listy w Przewodniku Zakupowym Spillane'a
             updateShoppingLists(seasonName);
         }
 
@@ -718,7 +752,6 @@
             const pdfWrapper = document.createElement('div');
             pdfWrapper.style.cssText = "position:absolute; left:-9999px; top:0; width:750px; background:#ffffff; color:#1c1b1a; padding:40px; box-sizing:border-box;";
             
-            // Klonowanie zawartości raportu do szablonu PDF
             pdfWrapper.innerHTML = `
                 <div style="border-bottom:2px solid #c5a880; padding-bottom:15px; margin-bottom:30px; text-align:center;">
                     <h1 style="font-family:Georgia,serif; font-size:28px; margin:0 0 5px 0;">AI Color Atelier</h1>
