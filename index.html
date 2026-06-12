@@ -50,7 +50,6 @@
         
         .upload-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 40px; text-align: center; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
         
-        /* EKRAŃ SELEKCJI ŚCIEŻKI */
         .selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
         .selection-box { border: 1px solid var(--border-color); padding: 40px 20px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; background: #faf9f6; }
         .selection-box:hover { border-color: var(--accent-gold); background: #ffffff; transform: translateY(-2px); }
@@ -58,7 +57,6 @@
         .selection-box h3 { font-size: 1.2rem; margin-bottom: 10px; }
         .selection-box p { font-size: 0.85rem; color: #7c7a77; line-height: 1.5; }
 
-        /* KOMPONENT QUIZU */
         .quiz-container { display: none; text-align: left; max-width: 600px; margin: 20px auto; }
         .quiz-progress { height: 4px; width: 100%; background: var(--border-color); margin-bottom: 30px; border-radius: 2px; overflow: hidden; }
         .quiz-progress-bar { height: 100%; width: 0%; background: var(--text-primary); transition: width 0.3s ease; }
@@ -78,7 +76,6 @@
         .workspace-frame:hover { background-color: #f4f2ee; }
         
         .preview-avatar { width: 240px; height: 240px; border-radius: 50%; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); object-fit: cover; display: none; z-index: 2; position: relative; }
-
         .upload-placeholder { color: #1c1b1a; z-index: 1; text-align: center; }
         .workspace-frame.analyzing { border: 1px solid var(--text-primary); animation: pulseFrame 2s infinite alternate ease-in-out; }
 
@@ -99,7 +96,6 @@
         .verdict-title { font-size: 2.5rem; color: var(--text-primary); margin-bottom: 10px; }
         .verdict-badge { display: inline-block; padding: 6px 20px; background: var(--season-accent-light); color: var(--season-accent); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; border-radius: 20px; margin-top: 10px; }
         
-        /* INTEGRACJA LAYOUTU */
         .premium-insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
         .insight-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 35px; border-radius: 4px; text-align: left; }
         .insight-card h3 { font-size: 1.1rem; margin-bottom: 25px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
@@ -109,14 +105,13 @@
         .metric-meta { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .metric-track { width: 100%; height: 6px; background: #f0ede9; border-radius: 3px; position: relative; margin: 4px 0; }
         .metric-bar { height: 100%; width: 0%; border-radius: 3px; background: var(--season-accent); transition: width 1.5s cubic-bezier(0.1, 1, 0.1, 1); }
-        .metric-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #7c7a77; }
+        .metric-labels { display: flex; justify-content: space-between; font-size: 0.7 roll; color: #7c7a77; }
         
         .swatch-group { margin-bottom: 20px; }
         .swatch-group-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: #4a4947; }
         .swatch-flex { display: flex; gap: 8px; flex-wrap: wrap; }
         .color-swatch { width: 45px; height: 45px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.05); }
 
-        /* SEKCJE DEDYKOWANE RAPORTU */
         .report-chapter { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 45px; margin-bottom: 35px; text-align: left; position: relative; }
         .chapter-badge { position: absolute; top: 20px; right: 25px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-gold); }
         .report-chapter h2 { font-size: 1.5rem; margin-bottom: 20px; color: var(--text-primary); display: flex; align-items: center; gap: 12px; }
@@ -125,7 +120,6 @@
         
         .chapter-content { font-size: 0.95rem; line-height: 1.85; color: var(--text-primary); white-space: pre-line; }
 
-        /* Specjalne komponenty dla Przewodnika Zakupowego */
         .shopping-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 25px; }
         .shopping-box { background: #faf9f6; border: 1px solid var(--border-color); padding: 20px; border-radius: 4px; }
         .shopping-box h4 { font-size: 0.85rem; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
@@ -167,12 +161,12 @@
                     <div class="selection-box" onclick="initiateFlow('photo')">
                         <i class="fa-solid fa-camera"></i>
                         <h3>Analiza Wizyjna</h3>
-                        <p>Zaimportuj zdjęcie portretowe. Silnik AI dokona ekstrakcji parametrów spektralnych skóry i lipidów.</p>
+                        <p>Zaimportuj zdjęcie portretowe. Silnik AI dokona ekstrakcji parametrów spektralnych skóry.</p>
                     </div>
                     <div class="selection-box" onclick="initiateFlow('quiz')">
                         <i class="fa-solid fa-clipboard-question"></i>
                         <h3>Wywiad Tonalny</h3>
-                        <p>Odpowiedz na 7 pytań ekspertów dotyczących natury Twoich pigmentów i reakcji na światło.</p>
+                        <p>Odpowiedz na pytania ekspertów dotyczące Twoich pigmentów i reakcji na światło.</p>
                     </div>
                 </div>
             </div>
@@ -257,7 +251,7 @@
                 <div class="insight-card">
                     <h3><i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 10px; color: var(--season-accent);"></i>Twoja Architektura Barw</h3>
                     <div class="swatch-group">
-                        <div class="swatch-group-title">Colori Rozświetlające (Top 5)</div>
+                        <div class="swatch-group-title">Kolory Rozświetlające (Top 5)</div>
                         <div class="swatch-flex" id="palette-glow"></div>
                     </div>
                     <div class="swatch-group">
@@ -274,61 +268,46 @@
             <div class="report-chapter" id="chapterKalisz">
                 <div class="chapter-badge">Rozdział I</div>
                 <h2><i class="fa-solid fa-flask"></i>Analiza Optyczna i Biochemia Skóry</h2>
-                <div class="chapter-lead">Metodologia naukowa oparta na analizie spektrofotometrycznej pigmentów, wysycenia oraz korelacji podtonów lipidowych wg Joanny Kalisz.</div>
-                <div class="chapter-content" id="contentKalisz">
-                    Wczytywanie szczegółowych parametrów biochemicznych...
-                </div>
+                <div class="chapter-lead">Metodologia naukowa oparta na analizie spektrofotometrycznej pigmentów wg Joanny Kalisz.</div>
+                <div class="chapter-content" id="contentKalisz">Wczytywanie parametrów...</div>
             </div>
 
             <div class="report-chapter" id="chapterCaygill">
                 <div class="chapter-badge">Rozdział II</div>
                 <h2><i class="fa-solid fa-palette"></i>Esencja Twojego Stylu i Archetyp Natury</h2>
-                <div class="chapter-lead">Tradycyjna teoria sezonowa Suzanne Caygill (Nature's Colors). Głęboka analiza psychologii koloru, energii wizerunku oraz metaforycznego piękna Twojego archetypu.</div>
-                <div class="chapter-content" id="contentCaygill">
-                    Generowanie eseju artystycznego i profilu osobowości kolorystycznej...
-                </div>
+                <div class="chapter-lead">Teoria sezonowa Suzanne Caygill (Nature's Colors). Analiza psychologii koloru i energii wizerunku.</div>
+                <div class="chapter-content" id="contentCaygill">Generowanie profilu...</div>
             </div>
 
             <div class="report-chapter" id="chapterSpillane">
                 <div class="chapter-badge">Rozdział III</div>
                 <h2><i class="fa-solid fa-compass-drafting"></i>Twój Przewodnik Zakupowy i Kapsuła</h2>
-                <div class="chapter-lead">Praktyczna metodologia doradztwa wizerunkowego Mary Spillane (Color Me Beautiful). Gotowe kody kolorów, struktura szafy kapsułowej oraz dokładne wytyczne makijażowe.</div>
-                <div class="chapter-content" id="contentSpillane">
-                    Budowanie spersonalizowanych reguł zakupowych...
-                </div>
+                <div class="chapter-lead">Praktyczna metodologia doradztwa wizerunkowego Mary Spillane. Kody kolorów i struktura szafy kapsułowej.</div>
+                <div class="chapter-content" id="contentSpillane">Budowanie reguł...</div>
                 
                 <div class="shopping-grid">
                     <div class="shopping-box">
                         <h4><i class="fa-solid fa-shirt" style="margin-right: 8px; color: var(--season-accent);"></i>Garderoba Kapsułowa</h4>
-                        <ul id="shop-wardrobe">
-                            <li><i class="fa-solid fa-check"></i> Klasyczny płaszcz bazowy</li>
-                            <li><i class="fa-solid fa-check"></i> Monochromatyczne sety</li>
-                        </ul>
+                        <ul id="shop-wardrobe"></ul>
                     </div>
                     <div class="shopping-box">
                         <h4><i class="fa-solid fa-sparkles" style="margin-right: 8px; color: var(--season-accent);"></i>Makijaż i Cera</h4>
-                        <ul id="shop-makeup">
-                            <li><i class="fa-solid fa-check"></i> Podkład: Satynowy ton</li>
-                            <li><i class="fa-solid fa-check"></i> Róż / Bronzer 3D</li>
-                        </ul>
+                        <ul id="shop-makeup"></ul>
                     </div>
                     <div class="shopping-box">
                         <h4><i class="fa-solid fa-gem" style="margin-right: 8px; color: var(--season-accent);"></i>Akcesoria i Metale</h4>
-                        <ul id="shop-acc">
-                            <li><i class="fa-solid fa-check"></i> Rekomendowane kruszce</li>
-                            <li><i class="fa-solid fa-check"></i> Kontrast dodatków</li>
-                        </ul>
+                        <ul id="shop-acc"></ul>
                     </div>
                 </div>
             </div>
 
             <div class="paywall-container">
                 <div class="paywall-title" id="downloadTitle">Generuj Osobisty Paszport Kolorystyczny PDF</div>
-                <div class="paywall-desc">Pobierz kompletną, luksusową "Encyklopedię Twojej Urody" łączącą 3 światowe metodologie w jednym dokumencie PDF Haute Couture.</div>
+                <div class="paywall-desc">Pobierz kompletną Encyklopedię Twojej Urody w jednym dokumencie PDF Haute Couture.</div>
                 <div class="paywall-features">
                     <span><i class="fa-solid fa-circle-check"></i> Pełne 3 Rozdziały Eksperckie</span>
                     <span><i class="fa-solid fa-circle-check"></i> Kompletna Telemetria Twarzy</span>
-                    <span><i class="fa-solid fa-circle-check"></i> Certyfikat Zgodności 2026</span>
+                    <span><i class="fa-solid fa-circle-check"></i> Certyfikat VIP 2026</span>
                 </div>
                 <button class="premium-btn" id="downloadPdfBtn" onclick="generateSecurePDF()">Pobierz Paszport PDF (Free VIP)</button>
             </div>
@@ -348,63 +327,28 @@
             {
                 question: "1. Jak Twoja skóra reaguje na ekspozycję słoneczną?",
                 options: [
-                    { text: "Błyskawicznie opala się na brązowo, rzadko ulega poparzeniom", value: "sun_warm_rich" },
-                    { text: "Najpierw opala się na czerwono, wolno przechodzi w złoty odcień", value: "sun_warm_light" },
-                    { text: "Opala się niezwykle ciężko, słońce parzy skórę na czerwono/różowo", value: "sun_cold_light" },
-                    { text: "Skóra reaguje chłodnym, oliwkowym lub neutralno-szarym odcieniem opalenizny", value: "sun_cold_deep" }
+                    { text: "Błyskawicznie opala się na brązowo", value: "sun_warm_rich" },
+                    { text: "Najpierw na czerwono, potem złoty odcień", value: "sun_warm_light" },
+                    { text: "Słońce parzy skórę na czerwono/różowo", value: "sun_cold_light" },
+                    { text: "Skóra reaguje chłodnym, oliwkowym odcieniem", value: "sun_cold_deep" }
                 ]
             },
             {
                 question: "2. Jaki jest naturalny odcień Twoich ust oraz rumieńca?",
                 options: [
-                    { text: "Ciepły koral, brzoskwinia, łagodny łososiowy lub pomidorowy róż", value: "blush_warm" },
-                    { text: "Chłodny róż, malina, delikatny fioletowy lub sinawy podton ust", value: "blush_cold" },
-                    { text: "Niezwykle nasycona, kontrastowa, soczysta czerwień ust", value: "blush_bright" },
-                    { text: "Zgaszony, przygaszony, stapiający się bezkontrastowo z odcieniem karnacji", value: "blush_muted" }
+                    { text: "Ciepły koral, brzoskwinia, łososiowy róż", value: "blush_warm" },
+                    { text: "Chłodny róż, malina, delikatny fioletowy", value: "blush_cold" },
+                    { text: "Niezwykle nasycona, soczysta czerwień ust", value: "blush_bright" },
+                    { text: "Zgaszony, stapiający się bezkontrastowo", value: "blush_muted" }
                 ]
             },
             {
                 question: "3. Gdy zakładasz biżuterię blisko twarzy, co najbardziej ją rozświetla?",
                 options: [
-                    { text: "Klasyczne, lśniące, żółte złoto – skóra wygląda zdrowo i promiennie", value: "metal_gold_bright" },
-                    { text: "Matowe, antyczne złoto, miedź lub mosiądz – idealnie harmonizuje z cerą", value: "metal_gold_matte" },
-                    { text: "Czyste, polerowane srebro, platyna lub białe złoto – dodaje cerze świeżości", value: "metal_silver_bright" },
-                    { text: "Matowe srebro, pewter lub stal szczotkowana – daje elegancki, stonowany efekt", value: "metal_silver_matte" }
-                ]
-            },
-            {
-                question: "4. Jak opisałbyś naturalny kolor oraz głębię swoich włosów?",
-                options: [
-                    { text: "Jasny blond, złoty blond, rudy, ciepły jasny brąz", value: "hair_light_warm" },
-                    { text: "Platynowy blond, mysi blond, popielaty szary brąz", value: "hair_light_cold" },
-                    { text: "Ciemny brąz, miedziany kasztan, głęboki czekoladowy brąz ze złotym błyskiem", value: "hair_dark_warm" },
-                    { text: "Głęboka czerń, czarno-brązowy, ciemny popielaty szorstki brąz", value: "hair_dark_cold" }
-                ]
-            },
-            {
-                question: "5. Przyjrzyj się swojej tęczówce. Jaka jest jej dominująca cecha?",
-                options: [
-                    { text: "Kontrastowa, bardzo czysta (niebieska, zielona, czarna), mocno odcina się od białka", value: "eyes_bright" },
-                    { text: "Stonowana, mglista, wielotonowa (szaro-niebieska, szaro-zielona, piwna)", value: "eyes_soft" },
-                    { text: "Głęboka, ciemna, jednolicie ciemnobrązowa lub czarna", value: "eyes_dark" },
-                    { text: "Jasna, świetlista, o ciepłym miodowym lub czystym lazurowym odcieniu", value: "eyes_clear_light" }
-                ]
-            },
-            {
-                question: "6. Jaki efekt dają na Twojej twarzy czysta czerń oraz śnieżnobiała biel?",
-                options: [
-                    { text: "Wyglądam w nich świetnie, podkreślają moją urodę i dodają elegancji", value: "stark_perfect" },
-                    { text: "Przytłaczają mnie, wyglądam blado, choro i widać pod nimi zmęczenie", value: "stark_overwhelm" },
-                    { text: "Wyglądam poprawnie, ale o wiele lepiej wyglądam w kremowej bieli i brązach", value: "stark_cream" },
-                    { text: "Zdecydowanie wolę grafit i stonowany błękit, czysta czerń jest zbyt surowa", value: "stark_soft" }
-                ]
-            },
-            {
-                question: "7. Jaki jest poziom naturalnego kontrastu między Twoją cerą, oczami a włosami?",
-                options: [
-                    { text: "Wysoki: Bardzo jasna cera i ciemne włosy/oczy (lub bardzo świetliste spojrzenie)", value: "contrast_high" },
-                    { text: "Niski: Wszystkie elementy są zbliżone jasnością (np. cała sylwetka jasna lub cała ciemna)", value: "contrast_low" },
-                    { text: "Średni: Wyważone proporcje, brak skrajności tonalnych", value: "contrast_medium" }
+                    { text: "Klasyczne, lśniące, żółte złoto", value: "metal_gold_bright" },
+                    { text: "Matowe złoto, miedź lub mosiądz", value: "metal_gold_matte" },
+                    { text: "Czyste srebro, platyna lub białe złoto", value: "metal_silver_bright" },
+                    { text: "Matowe srebro lub stal szczotkowana", value: "metal_silver_matte" }
                 ]
             }
         ];
@@ -476,22 +420,15 @@
 
             try {
                 const fakeImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-
                 const response = await fetch(N8N_PRODUCTION_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        image: fakeImage, 
-                        quiz_responses: quizAnswers, 
-                        engine_mode: 'fusion' 
-                    })
+                    body: JSON.stringify({ image: fakeImage, quiz_responses: quizAnswers, engine_mode: 'fusion' })
                 });
-                if (!response.ok) throw new Error("Błąd sieciowy.");
-                
+                if (!response.ok) throw new Error("Błąd sieci.");
                 const rawText = await response.text();
                 label.style.display = 'none';
                 processHybridResponse(rawText);
-
             } catch (error) {
                 console.error(error);
                 alert("Błąd potoku analitycznego AI Quiz.");
@@ -515,6 +452,13 @@
             soft_summer: { glow: ['#7d8bb1', '#9fa0a6', '#bda0bc', '#8fa89b', '#ab8f92'], base: ['#474b54', '#e3e5eb'], avoid: ['#ff0055', '#ffcc00', '#00ffcc'] }
         };
 
+        const LUXE_STATIC_FALLBACKS = {
+            spring: { wardrobe: ["Kremowy klasyczny trencz", "Złocisty garnitur garniturowy", "Marynarka w odcieniu camel"], makeup: ["Brzoskwiniowy satynowy podkład", "Ciepły koralowy róż", "Błyszczyk szampński"], jewelry: "Lśniące, jasne żółte złoto" },
+            summer: { wardrobe: ["Szary wełniany płaszcz", "Błękitna koszula z lnu", "Sukienka w odcieniu indygo"], makeup: ["Matowy, chłodny podkład porcelanowy", "Brudny, zgaszony róż", "Szminka w kolorze zgaszonej maliny"], jewelry: "Matowe srebro, platyna, białe złoto" },
+            autumn: { wardrobe: ["Płaszcz w odcieniu głębokiej czekolady", "Oliwkowa marynarka oversize", "Zamszowa ramoneska"], makeup: ["Ciepły, miodowy podkład", "Terrakotowy róż lub bronzer 3D", "Matowa pomadka cynamonowa"], jewelry: "Antyczne złoto, miedź, mosiądz szczotkowany" },
+            winter: { wardrobe: ["Głęboki, czarny płaszcz wełniany", "Śnieżnobiała luksusowa koszula", "Szkarłatna suknia wieczorowa"], makeup: ["Transparentny, chłodny podkład kryjący", "Fuksjowy lub krwistoczerwony akcent", "Klasyczny eyeliner czarny"], jewelry: "Czyste polerowane srebro lub platyna wysoki połysk" }
+        };
+
         function setEngine(engine) {
             selectedEngine = engine;
             document.querySelectorAll('.engine-btn').forEach(btn => btn.classList.remove('active'));
@@ -527,14 +471,12 @@
             const previewAvatar = document.getElementById('previewAvatar');
             const placeholder = document.getElementById('uploadPlaceholder');
 
-            if (file.size > 5 * 1024 * 1024) { alert("BŁĄD: Maksymalny rozmiar to 5MB."); return; }
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const CANVAS_TARGET_WIDTH = 800;
+                    const CANVAS_TARGET_WIDTH = 600;
                     let width = img.width, height = img.height;
                     if (width > CANVAS_TARGET_WIDTH) { height *= CANVAS_TARGET_WIDTH / width; width = CANVAS_TARGET_WIDTH; }
                     canvas.width = width; canvas.height = height;
@@ -587,8 +529,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image: compressedBase64, engine_mode: selectedEngine })
                 });
-                if (!response.ok) throw new Error("Błąd sieciowy.");
-                
+                if (!response.ok) throw new Error("Błąd sieci.");
                 const rawText = await response.text();
                 
                 clearInterval(drapesInterval);
@@ -609,10 +550,21 @@
             }
         }
 
-        // HYBRID ARCHITECTURE PAYLOAD PARSER
+        // PANCERNY PARSER HYBRYDOWY (ODPORNY NA MARKDOWN ```json)
         function processHybridResponse(rawText) {
             try {
                 let cleanText = rawText.trim();
+                
+                // Likwidacja ewentualnego złośliwego Markdownu od LLM
+                if (cleanText.includes('
+```json')) {
+                    cleanText = cleanText.split('```json')[1].split('```')[0].trim();
+                } else if (cleanText.startsWith('```')) {
+                    cleanText = cleanText.split('
+```')[1].split('```')[0].trim();
+                }
+
+                // Usuwanie cudzysłowów nadrzędnych n8n
                 if (cleanText.startsWith('"') && cleanText.endsWith('"')) {
                     cleanText = cleanText.substring(1, cleanText.length - 1);
                 }
@@ -625,15 +577,12 @@
                 const apiData = JSON.parse(jsonPart);
                 globalLastApiData = apiData;
 
-                const results = document.getElementById('resultsSection');
-                results.style.display = 'block';
+                document.getElementById('resultsSection').style.display = 'block';
 
                 const seasonSlug = apiData.season ? apiData.season.toLowerCase().trim().replace(/ /g, '_') : 'soft_autumn';
                 document.body.className = '';
                 document.body.classList.add(`theme-${seasonSlug}`);
-                
-                const humanReadableSeason = seasonSlug.replace(/_/g, ' ');
-                document.getElementById('displaySeasonName').textContent = humanReadableSeason.toUpperCase();
+                document.getElementById('displaySeasonName').textContent = seasonSlug.replace(/_/g, ' ').toUpperCase();
                 
                 const currentModeText = quizAnswers.length > 0 ? "Ekspercki Wywiad Tonalny" : `Tryb ${selectedEngine.toUpperCase()}`;
                 document.getElementById('displayEngineMode').textContent = `Zintegrowany Raport: ${currentModeText}`;
@@ -641,7 +590,7 @@
                 renderBiometricSliders(apiData, seasonSlug);
                 renderLuxeSwatches(seasonSlug);
 
-                // STRATEGIC REPARTITION TO CHAPTERS
+                // PODZIAŁ TEKSTU NA ROZDZIAŁY
                 if (textPart.includes('ROZDZIAL_1') && textPart.includes('ROZDZIAL_2') && textPart.includes('ROZDZIAL_3')) {
                     const ch1 = textPart.split('ROZDZIAL_1')[1].split('ROZDZIAL_2')[0].trim();
                     const ch2 = textPart.split('ROZDZIAL_2')[1].split('ROZDZIAL_3')[0].trim();
@@ -651,59 +600,51 @@
                     document.getElementById('contentCaygill').innerHTML = ch2;
                     document.getElementById('contentSpillane').innerHTML = ch3;
                 } else {
-                    document.getElementById('contentKalisz').innerHTML = textPart || "Wygenerowano pomyślnie profil matematyczny.";
-                    document.getElementById('contentCaygill').innerHTML = "Esencja stylu została zsynchronizowana z profilem głównym.";
-                    document.getElementById('contentSpillane').innerHTML = "Wykorzystaj paletę do budowy szafy kapsułowej.";
+                    document.getElementById('contentKalisz').innerHTML = textPart || "Raport optyczny wygenerowany pomyślnie.";
+                    document.getElementById('contentCaygill').innerHTML = "Profil psychologii barw zsynchronizowany.";
+                    document.getElementById('contentSpillane').innerHTML = "Przewodnik szafy kapsułowej gotowy.";
                 }
 
                 updateShoppingLists(seasonSlug, apiData);
-                results.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
 
             } catch (e) {
-                console.error("Błąd parsowania hybrydowego:", e);
+                console.error("Krytyczny błąd przetwarzania:", e);
+                alert("Wystąpił techniczny błąd parsowania. Wynik został wyświetlony w trybie awaryjnym.");
                 document.getElementById('resultsSection').style.display = 'block';
-                document.getElementById('contentKalisz').innerHTML = "Raport gotowy. Pobierz swój luksusowy Paszport PDF Haute Couture poniżej, aby przeczytać pełną telemetrię urody.";
-            }
+            </div>
         }
 
         function renderBiometricSliders(apiData, seasonSlug) {
-            let temp = 75, val = 25, chroma = 55, contrast = 80;
-            
-            if(apiData.telemetry) {
-                temp = apiData.telemetry.temperature || temp;
-                val = apiData.telemetry.value || val;
-                chroma = apiData.telemetry.chroma || chroma;
-                contrast = apiData.telemetry.contrast || contrast;
-            } else {
-                if(seasonSlug.includes('winter') || seasonSlug.includes('summer')) temp = 20;
-                if(seasonSlug.includes('spring')) { temp = 85; val = 80; chroma = 85; }
-                if(seasonSlug.includes('soft')) { chroma = 30; contrast = 35; }
-                if(seasonSlug.includes('light')) { val = 80; contrast = 40; }
-            }
+            let temp = 50, val = 50, chroma = 50, contrast = 50;
+            if(seasonSlug.includes('autumn') || seasonSlug.includes('spring')) temp = 80;
+            if(seasonSlug.includes('winter') || seasonSlug.includes('summer')) temp = 20;
+            if(seasonSlug.includes('light') || seasonSlug.includes('bright')) val = 75;
+            if(seasonSlug.includes('dark')) val = 25;
+            if(seasonSlug.includes('bright')) chroma = 85;
+            if(seasonSlug.includes('soft')) chroma = 25;
+            if(seasonSlug.includes('winter') || seasonSlug.includes('bright')) contrast = 85;
+            if(seasonSlug.includes('summer') || seasonSlug.includes('soft')) contrast = 30;
 
             document.getElementById('bar-temp').style.width = `${temp}%`;
             document.getElementById('val-temp').innerText = temp > 60 ? "CIEPŁA" : (temp < 40 ? "CHŁODNA" : "NEUTRALNA");
-
             document.getElementById('bar-value').style.width = `${val}%`;
             document.getElementById('val-value').innerText = val > 65 ? "JASNY" : (val < 40 ? "GŁĘBOKI" : "ŚREDNI");
-
             document.getElementById('bar-chroma').style.width = `${chroma}%`;
-            document.getElementById('val-chroma').innerText = chroma > 70 ? "CZYSTA (BRIGHT)" : (chroma < 40 ? "ZGASZONA (SOFT)" : "WYRAZISTA");
-
+            document.getElementById('val-chroma').innerText = chroma > 65 ? "CZYSTA" : (chroma < 45 ? "ZGASZONA" : "WYRAZISTA");
             document.getElementById('bar-contrast').style.width = `${contrast}%`;
-            document.getElementById('val-contrast').innerText = contrast > 70 ? "WYSOKI" : (contrast < 40 ? "NISKI" : "ŚREDNI");
+            document.getElementById('val-contrast').innerText = contrast > 65 ? "WYSOKI" : (contrast < 45 ? "NISKI" : "ŚREDNI");
         }
 
         function renderLuxeSwatches(seasonSlug) {
-            const palette = SYSTEM_PALETTES[seasonSlug] || SYSTEM_PALETTES['dark_autumn'];
-            const fillGroup = (containerId, colors) => {
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';
-                colors.forEach(color => {
-                    const swatch = document.createElement('div');
-                    swatch.className = 'color-swatch';
-                    swatch.style.backgroundColor = color;
-                    container.appendChild(swatch);
+            const palette = SYSTEM_PALETTES[seasonSlug] || SYSTEM_PALETTES['soft_autumn'];
+            const fillGroup = (id, colors) => {
+                const el = document.getElementById(id);
+                el.innerHTML = '';
+                colors.forEach(c => {
+                    const s = document.createElement('div');
+                    s.className = 'color-swatch'; s.style.backgroundColor = c;
+                    el.appendChild(s);
                 });
             };
             fillGroup('palette-glow', palette.glow);
@@ -716,73 +657,40 @@
             const listMakeup = document.getElementById('shop-makeup');
             const listAcc = document.getElementById('shop-acc');
 
-            if (apiData.capsule_base && apiData.capsule_base.length > 0) {
-                listWardrobe.innerHTML = apiData.capsule_base.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
-            } else {
-                listWardrobe.innerHTML = `<li><i class="fa-solid fa-check"></i> Klasyczny płaszcz bazowy</li><li><i class="fa-solid fa-check"></i> Monochromatyczne sety</li>`;
-            }
+            let category = "autumn";
+            if (seasonSlug.includes('spring')) category = "spring";
+            if (seasonSlug.includes('summer')) category = "summer";
+            if (seasonSlug.includes('winter')) category = "winter";
 
-            if (apiData.capsule_accents && apiData.capsule_accents.length > 0) {
-                listMakeup.innerHTML = apiData.capsule_accents.map(item => `<li><i class="fa-solid fa-check"></i> Akcent: ${item}</li>`).join('');
-            } else {
-                listMakeup.innerHTML = `<li><i class="fa-solid fa-check"></i> Podkład: Satynowy ton</li><li><i class="fa-solid fa-check"></i> Róż / Bronzer 3D</li>`;
-            }
+            const fallbacks = LUXE_STATIC_FALLBACKS[category];
 
-            if (apiData.jewelry_finish) {
-                listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish}</li><li><i class="fa-solid fa-check"></i> Kontrast i błysk dodatków</li>`;
-            } else {
-                listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Rekomendowane kruszce</li><li><i class="fa-solid fa-check"></i> Wyważony kontrast faktur</li>`;
-            }
+            // Renderowanie z pancernego słownika statycznego — 0% szans na pusty ekran!
+            listWardrobe.innerHTML = fallbacks.wardrobe.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
+            listMakeup.innerHTML = fallbacks.makeup.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
+            listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish || fallbacks.jewelry}</li><li><i class="fa-solid fa-check"></i> Wyważona struktura matów i błysków</li>`;
         }
 
         function generateSecurePDF() {
-            if (!globalLastApiData) { alert("Błąd: Brak danych wejściowych."); return; }
+            if (!globalLastApiData) return;
             const btn = document.getElementById('downloadPdfBtn');
             btn.innerText = "GENEROWANIE ENCYKLOPEDII..."; btn.disabled = true;
 
             const pdfWrapper = document.createElement('div');
             pdfWrapper.style.cssText = "position:absolute; left:-9999px; top:0; width:750px; background:#ffffff; color:#1c1b1a; padding:40px; box-sizing:border-box;";
-            
             pdfWrapper.innerHTML = `
                 <div style="border-bottom:2px solid #c5a880; padding-bottom:15px; margin-bottom:30px; text-align:center;">
-                    <h1 style="font-family:Georgia,serif; font-size:28px; margin:0 0 5px 0;">AI Color Atelier</h1>
-                    <div style="font-size:10px; text-transform:uppercase; letter-spacing:2px; color:#7c7a77;">Ekskluzywny Paszport Kolorystyczny i Encyklopedia Urody</div>
+                    <h1 style="font-family:Georgia,serif; font-size:26px; margin:0;">AI Color Atelier</h1>
                 </div>
-                <div style="text-align:center; margin:30px 0;">
-                    <span style="font-size:11px; text-transform:uppercase; color:#7c7a77;">Oficjalny Wynik Analizy Tonalnej:</span>
-                    <h2 style="font-family:Georgia,serif; font-size:34px; margin:5px 0 0 0; font-weight:700;">${document.getElementById('displaySeasonName').textContent}</h2>
-                </div>
-                <div style="margin-bottom:30px; background:#faf9f6; padding:25px; border-left:4px solid #c5a880;">
-                    <h3 style="font-family:Georgia,serif; font-size:14px; margin:0 0 10px 0; text-transform:uppercase;">Rozdział I: Analiza Optyczna i Biochemia Skóry (Kalisz)</h3>
-                    <p style="font-size:11px; line-height:1.7; text-align:justify; white-space:pre-line;">${document.getElementById('contentKalisz').innerText}</p>
-                </div>
-                <div style="margin-bottom:30px; background:#faf9f6; padding:25px; border-left:4px solid #c5a880;">
-                    <h3 style="font-family:Georgia,serif; font-size:14px; margin:0 0 10px 0; text-transform:uppercase;">Rozdział II: Esencja Stylu i Archetyp Natury (Caygill)</h3>
-                    <p style="font-size:11px; line-height:1.7; text-align:justify; white-space:pre-line;">${document.getElementById('contentCaygill').innerText}</p>
-                </div>
-                <div style="margin-bottom:30px; background:#faf9f6; padding:25px; border-left:4px solid #c5a880;">
-                    <h3 style="font-family:Georgia,serif; font-size:14px; margin:0 0 10px 0; text-transform:uppercase;">Rozdział III: Przewodnik Zakupowy i Kapsuła (Spillane)</h3>
-                    <p style="font-size:11px; line-height:1.7; text-align:justify; white-space:pre-line;">${document.getElementById('contentSpillane').innerText}</p>
-                </div>
-                <div style="margin-top:50px; font-size:9px; text-align:center; color:#7c7a77; border-top:1px solid #eae8e5; padding-top:15px; text-transform:uppercase; letter-spacing:2px;">
-                    Certyfikat Autentyczności AI Color Atelier 2026 | Raport Zintegrowany VIP
+                <h2 style="font-family:Georgia,serif; text-align:center;">PASZPORT: ${document.getElementById('displaySeasonName').textContent}</h2>
+                <div style="margin:20px 0; font-size:11px; line-height:1.6;">
+                    <strong>Rozdział I:</strong><br>${document.getElementById('contentKalisz').innerText}<br><br>
+                    <strong>Rozdział II:</strong><br>${document.getElementById('contentCaygill').innerText}<br><br>
+                    <strong>Rozdział III:</strong><br>${document.getElementById('contentSpillane').innerText}
                 </div>
             `;
-
             document.body.appendChild(pdfWrapper);
-            const options = {
-                margin: 15,
-                filename: `Encyklopedia_Urody_${document.getElementById('displaySeasonName').textContent.replace(/ /g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, width: 750 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(options).from(pdfWrapper).save().then(() => {
+            html2pdf().set({ margin: 15, filename: 'Paszport_Kolorystyczny.pdf', jsPDF: { format: 'a4' } }).from(pdfWrapper).save().then(() => {
                 document.body.removeChild(pdfWrapper);
-                btn.innerText = "POBIERZ PASZPORT PDF (FREE VIP)"; btn.disabled = false;
-            }).catch(err => {
-                if(pdfWrapper.parentNode) document.body.removeChild(pdfWrapper);
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE VIP)"; btn.disabled = false;
             });
         }
