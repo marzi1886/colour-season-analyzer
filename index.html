@@ -19,7 +19,7 @@
             --border-color: #eae8e5;
             --season-accent: #c5a880;
             --season-accent-light: rgba(197, 168, 128, 0.1);
-            --season-gradient: linear-gradient(135deg, #fcfbfa 0%, #f5f2ed 100%);
+            --season-gradient: linear-gradient(135deg, #fcfbfa 0%, #f5f2ed100%);
             
             --cold-color: #5b82a6;
             --warm-color: #d99852;
@@ -158,10 +158,8 @@
 
     <div class="main-container">
 
-        <!-- KARTA INPUTU -->
         <div class="upload-card" id="inputCard">
             
-            <!-- EKRAN STARTOWY: WYBÓR METODOLOGII -->
             <div id="modeSelectionBlock">
                 <h2>Wybierz Tryb Diagnostyki</h2>
                 <div class="brand-subtitle" style="margin-bottom: 10px;">Dopasuj ścieżkę analizy do swoich preferencji</div>
@@ -179,7 +177,6 @@
                 </div>
             </div>
 
-            <!-- BLOK FOTO (UKRYTY DOMYŚLNIE) -->
             <div id="photoFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Rozpocznij Analizę Wizyjną</h2>
@@ -205,7 +202,6 @@
                 <button class="action-btn" id="submitBtn" onclick="runAnalysis()">Uruchom silnik AI</button>
             </div>
 
-            <!-- BLOK QUIZU (UKRYTY DOMYŚLNIE) -->
             <div id="quizFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Ekspercki Wywiad Tonalny</h2>
@@ -223,17 +219,14 @@
             <div class="draping-status-label" id="drapingStatusLabel">Inicjalizacja próbki...</div>
         </div>
 
-        <!-- SEKCJA WYNIKÓW (WARIANT A: TRZY DEDYKOWANE ROZDZIAŁY W JEDNYM RAPORCIE) -->
         <div class="results-section" id="resultsSection">
 
-            <!-- Nagłówek Zgodny z image_c6ea76.png -->
             <div class="verdict-header">
                 <div class="brand-subtitle">Matematyczny Werdykt Silnika</div>
                 <div class="verdict-title" id="displaySeasonName">...</div>
                 <div class="verdict-badge" id="displayEngineMode">Tryb: Fuzja Metodologii</div>
             </div>
 
-            <!-- Podgląd Telemetrii i Barw Zgodny z image_c6ea76.png -->
             <div class="premium-insights-grid">
                 <div class="insight-card">
                     <h3><i class="fa-solid fa-chart-simple" style="margin-right: 10px; color: var(--season-accent);"></i>Parametry Twojej Urody</h3>
@@ -278,7 +271,6 @@
                 </div>
             </div>
 
-            <!-- ================= ROZDZIAŁ 1: SILNIK KALISZ ================= -->
             <div class="report-chapter" id="chapterKalisz">
                 <div class="chapter-badge">Rozdział I</div>
                 <h2><i class="fa-solid fa-flask"></i>Analiza Optyczna i Biochemia Skóry</h2>
@@ -288,7 +280,6 @@
                 </div>
             </div>
 
-            <!-- ================= ROZDZIAŁ 2: SILNIK CAYGILL ================= -->
             <div class="report-chapter" id="chapterCaygill">
                 <div class="chapter-badge">Rozdział II</div>
                 <h2><i class="fa-solid fa-palette"></i>Esencja Twojego Stylu i Archetyp Natury</h2>
@@ -298,7 +289,6 @@
                 </div>
             </div>
 
-            <!-- ================= ROZDZIAŁ 3: SILNIK SPILLANE ================= -->
             <div class="report-chapter" id="chapterSpillane">
                 <div class="chapter-badge">Rozdział III</div>
                 <h2><i class="fa-solid fa-compass-drafting"></i>Twój Przewodnik Zakupowy i Kapsuła</h2>
@@ -307,7 +297,6 @@
                     Budowanie spersonalizowanych reguł zakupowych...
                 </div>
                 
-                <!-- Funkcjonalny komponent przewodnika zakupowego premium -->
                 <div class="shopping-grid">
                     <div class="shopping-box">
                         <h4><i class="fa-solid fa-shirt" style="margin-right: 8px; color: var(--season-accent);"></i>Garderoba Kapsułowa</h4>
@@ -333,7 +322,6 @@
                 </div>
             </div>
 
-            <!-- DOLNY PANEL POBIERANIA PDF -->
             <div class="paywall-container">
                 <div class="paywall-title" id="downloadTitle">Generuj Osobisty Paszport Kolorystyczny PDF</div>
                 <div class="paywall-desc">Pobierz kompletną, luksusową "Encyklopedię Twojej Urody" łączącą 3 światowe metodologie w jednym dokumencie PDF Haute Couture.</div>
@@ -623,12 +611,12 @@
             const results = document.getElementById('resultsSection');
             results.style.display = 'block';
 
-            const seasonSlug = apiData.identified_season ? apiData.identified_season.toLowerCase().trim().replace(/ /g, '_') : 'dark_autumn';
+            const seasonSlug = apiData.identified_season ? apiData.identified_season.toLowerCase().trim().replace(/ /g, '_') : 'soft_autumn';
             document.body.className = '';
             document.body.classList.add(`theme-${seasonSlug}`);
 
-            const humanReadableSeason = apiData.identified_season ? apiData.identified_season.replace(/_/g, ' ') : "DARK AUTUMN";
-            document.getElementById('displaySeasonName').textContent = humanReadableSeason;
+            const humanReadableSeason = apiData.identified_season ? apiData.identified_season.replace(/_/g, ' ') : "SOFT AUTUMN";
+            document.getElementById('displaySeasonName').textContent = humanReadableSeason.toUpperCase();
             
             const currentModeText = compressedBase64 ? `Tryb ${selectedEngine.toUpperCase()}` : "Ekspercki Wywiad Tonalny";
             document.getElementById('displayEngineMode').textContent = `Zintegrowany Raport: ${currentModeText}`;
@@ -639,14 +627,14 @@
             // 2. Renderowanie Próbek Kolorów Haute Couture
             renderLuxeSwatches(seasonSlug);
 
-            // 3. Dekompozycja Treści Raportu na 3 Dedykowane Sekcje Autorskie (Wariant A)
+            // 3. Dekompozycja Treści Raportu na 3 Dedykowane Sekcje Autorskie
             distributeReportToChapters(apiData, humanReadableSeason);
 
             results.scrollIntoView({ behavior: 'smooth' });
         }
 
         function renderBiometricSliders(apiData, seasonSlug) {
-            let temp = 75, val = 25, chroma = 55, contrast = 80; // Wzorzec Dark Autumn
+            let temp = 75, val = 25, chroma = 55, contrast = 80; // Wzorzec
             
             if(apiData.telemetry) {
                 temp = apiData.telemetry.temperature || temp;
@@ -691,56 +679,85 @@
         }
 
         function distributeReportToChapters(apiData, seasonName) {
-            const rawReport = apiData.ai_generated_report || "";
+            let rawReport = apiData.ai_generated_report || "";
             
-            let kaliszText = "", caygillText = "", spillaneText = "";
-
-            if (rawReport.includes("ANALIZA TECHNICZNA") || rawReport.includes("PIERWSZE WRAŻENIE")) {
-                const parts = rawReport.split(/(?=\d\.\s|MAKIJAŻ|STYLING|PALETA)/g);
-                parts.forEach(p => {
-                    if(p.includes("PIERWSZE WRAŻENIE") || p.includes("ANALIZA TECHNICZNA")) kaliszText += p;
-                    else if(p.includes("PALETA") || p.includes("PODSUMOWANIE")) caygillText += p;
-                    else if(p.includes("MAKIJAŻ") || p.includes("STYLING")) spillaneText += p;
-                });
+            // FAIL-SAFE: Jeśli model dokleił surowy JSON na końcu, odcinamy od znaku "{" lub cudzysłowów
+            if (rawReport.includes("{")) {
+                rawReport = rawReport.split("{")[0];
+            }
+            if (rawReport.includes('", "')) {
+                rawReport = rawReport.split('", "')[0];
             }
 
-            document.getElementById('contentKalisz').innerHTML = kaliszText ? kaliszText : 
-                `Na podstawie odczytów spektrofotometru optycznego, Twój profil został zaklasyfikowany do podgrupy: ${seasonName}.\n` +
-                `• Dominacja pigmentacji: Skondensowana, o gęstym rozkładzie melanocytów.\n` +
-                `• Reakcja naczyniowa: Podton stabilny, lekko ciepły, wykazujący wysoki stopień absorpcji fal zimnych.\n` + 
-                (apiData.ai_generated_report ? `\nOto szczegóły z analizy ogólnej:\n${rawReport.substring(0, 450)}...` : '');
+            // EXTRAKCJA OBSZERNYCH DANYCH Z DYNAMICZNEGO JSON-A
+            const opisKalisz = apiData.description || "";
+            const opisCaygill = apiData.style || "";
+            
+            // Budujemy obszerną i kompletną sekcję praktyczną Spillane'a
+            let opisSpillane = "";
+            if (apiData.makeup) {
+                opisSpillane += `<p style="margin-bottom: 15px;"><strong><i class="fa-solid fa-sparkles" style="color: var(--season-accent); margin-right: 6px;"></i> Rekomendacje makijażowe:</strong><br>${apiData.makeup}</p>`;
+            }
+            if (apiData.hair) {
+                opisSpillane += `<p style="margin-bottom: 15px;"><strong><i class="fa-solid fa-scissors" style="color: var(--season-accent); margin-right: 6px;"></i> Koloryzacja i stylizacja włosów:</strong><br>${apiData.hair}</p>`;
+            }
+            
+            // Wstrzyknięcie ikon stylu i celebrytów na końcu Rozdziału III
+            if (apiData.celebrities && apiData.celebrities.length > 0) {
+                opisSpillane += `<p style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">`;
+                opisSpillane += `<strong><i class="fa-solid fa-star" style="color: var(--accent-gold); margin-right: 6px;"></i> Twoje globalne ikony stylu (Archetypy siostrzane):</strong><br>`;
+                opisSpillane += `<span style="font-style: italic; color: #5e5c59;">${apiData.celebrities.join(', ')}</span></p>`;
+            }
 
-            document.getElementById('contentCaygill').innerHTML = caygillText ? caygillText :
-                `Twój archetyp piękna w systemie Suzanne Caygill odpowiada głębi i dostojeństwu bogatych, nasyconych sił natury.\n` +
-                `Wizerunek ten niesie ze sobą potężny ładunek elegancji. Twoja aura kolorystyczna przypomina głęboki, luksusowy kobalt wieczornego nieba przeplatany złotymi nićmi słońca.\n` +
-                (apiData.ai_generated_report ? `\nUzupełnienie analizy stylu:\n${rawReport.substring(450, 900)}...` : '');
+            // WSTRZYKIWANIE TREŚCI DO ELEMENTÓW INTERFEJSU
+            const contentKaliszEl = document.getElementById('contentKalisz');
+            if (opisKalisz.trim()) {
+                contentKaliszEl.innerHTML = opisKalisz;
+            } else {
+                contentKaliszEl.innerHTML = `Na podstawie odczytów spektrofotometru optycznego, Twój profil został zaklasyfikowany do grupy: <strong>${seasonName}</strong>.<br>• Dominacja pigmentacji: Skondensowana, o stabilnym rozkładzie melanocytów.<br>• Reakcja naczyniowa: Podton wykazuje optymalny stopień absorpcji fal.`;
+            }
 
-            document.getElementById('contentSpillane').innerHTML = spillaneText ? spillaneText :
-                `Praktyczny przewodnik zakupowy w oparciu o system 12 typów urody.\n` +
-                `Wybieraj ubrania, które utrzymują wysoki poziom kontrastu naturalnego Twojej twarzy. Unikaj rozmytych, pastelowych szarości blisko twarzy.\n` +
-                (apiData.ai_generated_report ? `\nDedykowane rekomendacje asorytmentu:\n${rawReport.substring(900)}` : '');
+            const contentCaygillEl = document.getElementById('contentCaygill');
+            if (opisCaygill.trim()) {
+                contentCaygillEl.innerHTML = opisCaygill;
+            } else {
+                contentCaygillEl.innerHTML = `Twój archetyp piękna w systemie Suzanne Caygill odpowiada dostojeństwu i harmonii sił natury dla profilu <strong>${seasonName}</strong>.<br>Twoja aura kolorystyczna niesie ze sobą potężny i wyrafinowany ładunek elegancji.`;
+            }
 
-            updateShoppingLists(seasonName);
+            const contentSpillaneEl = document.getElementById('contentSpillane');
+            if (opisSpillane.trim()) {
+                contentSpillaneEl.innerHTML = opisSpillane;
+            } else {
+                contentSpillaneEl.innerHTML = `Praktyczny przewodnik zakupowy w oparciu o system 12 typów urody.<br>Wybieraj ubrania, które utrzymują profesjonalny poziom kontrastu naturalnego Twojej twarzy. Unikaj barw rozmytych i pastelowych szarości blisko skóry.`;
+            }
+
+            updateShoppingLists(seasonName, apiData);
         }
 
-        function updateShoppingLists(seasonName) {
-            const lower = seasonName.toLowerCase();
+        function updateShoppingLists(seasonName, apiData) {
             const listWardrobe = document.getElementById('shop-wardrobe');
             const listMakeup = document.getElementById('shop-makeup');
             const listAcc = document.getElementById('shop-acc');
 
-            if(lower.includes('autumn') || lower.includes('jesień')) {
-                listWardrobe.innerHTML = `<li><i class="fa-solid fa-check"></i> Trencz w barwie Camel / Kakao</li><li><i class="fa-solid fa-check"></i> Garnitur Burgund / Głęboki Mech</li>`;
-                listMakeup.innerHTML = `<li><i class="fa-solid fa-check"></i> Pomadka: Ciepły Cynamon i Terakota</li><li><i class="fa-solid fa-check"></i> Cienie: Złoty brąz i Oliwka</li>`;
-                listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Biżuteria: Matowe, antyczne złoto</li><li><i class="fa-solid fa-check"></i> Skóra: Ciemna, czekoladowa fakturowana</li>`;
-            } else if(lower.includes('winter') || lower.includes('zima')) {
-                listWardrobe.innerHTML = `<li><i class="fa-solid fa-check"></i> Czysta czerń i głęboki Szmaragd</li><li><i class="fa-solid fa-check"></i> Kontrastowy Color-Blocking</li>`;
-                listMakeup.innerHTML = `<li><i class="fa-solid fa-check"></i> Pomadka: Klasyczne lśniące Bordeaux</li><li><i class="fa-solid fa-check"></i> Eyeliner: Głęboka, czysta czern</li>`;
-                listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Biżuteria: Polerowane, białe złoto</li><li><i class="fa-solid fa-check"></i> Akcesoria: Diamentowy błysk i onyks</li>`;
+            // Dynamiczne zasilanie garderoby z tablicy capsule_base z n8n
+            if (apiData.capsule_base && apiData.capsule_base.length > 0) {
+                listWardrobe.innerHTML = apiData.capsule_base.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
             } else {
-                listWardrobe.innerHTML = `<li><i class="fa-solid fa-check"></i> Pastelowy denim i jedwab</li><li><i class="fa-solid fa-check"></i> Lekkie, monochromatyczne sety</li>`;
-                listMakeup.innerHTML = `<li><i class="fa-solid fa-check"></i> Błyszczyk: Świeża brzoskwinia / koral</li><li><i class="fa-solid fa-check"></i> Podkład: Świetlisty BB Cream</li>`;
-                listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Biżuteria: Subtelne różowe złoto</li><li><i class="fa-solid fa-check"></i> Dodatki: Jasny beż i écru</li>`;
+                listWardrobe.innerHTML = `<li><i class="fa-solid fa-check"></i> Klasyczny płaszcz bazowy</li><li><i class="fa-solid fa-check"></i> Monochromatyczne sety</li>`;
+            }
+
+            // Dynamiczne wstrzykiwanie kosmetyków i akcentów z tablicy capsule_accents
+            if (apiData.capsule_accents && apiData.capsule_accents.length > 0) {
+                listMakeup.innerHTML = apiData.capsule_accents.map(item => `<li><i class="fa-solid fa-check"></i> Akcent: ${item}</li>`).join('');
+            } else {
+                listMakeup.innerHTML = `<li><i class="fa-solid fa-check"></i> Podkład: Satynowy ton</li><li><i class="fa-solid fa-check"></i> Róż / Bronzer 3D</li>`;
+            }
+
+            // Dynamiczne wstrzykiwanie wykończenia metali i biżuterii
+            if (apiData.jewelry_finish) {
+                listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish}</li><li><i class="fa-solid fa-check"></i> Kontrast i błysk dodatków</li>`;
+            } else {
+                listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Rekomendowane kruszce</li><li><i class="fa-solid fa-check"></i> Wyważony kontrast faktur</li>`;
             }
         }
 
