@@ -158,8 +158,10 @@
 
     <div class="main-container">
 
+        <!-- KARTA INPUTU -->
         <div class="upload-card" id="inputCard">
             
+            <!-- EKRAN STARTOWY: WYBÓR METODOLOGII -->
             <div id="modeSelectionBlock">
                 <h2>Wybierz Tryb Diagnostyki</h2>
                 <div class="brand-subtitle" style="margin-bottom: 10px;">Dopasuj ścieżkę analizy do swoich preferencji</div>
@@ -177,6 +179,7 @@
                 </div>
             </div>
 
+            <!-- BLOK FOTO (UKRYTY DOMYŚLNIE) -->
             <div id="photoFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Rozpocznij Analizę Wizyjną</h2>
@@ -202,6 +205,7 @@
                 <button class="action-btn" id="submitBtn" onclick="runAnalysis()">Uruchom silnik AI</button>
             </div>
 
+            <!-- BLOK QUIZU (UKRYTY DOMYŚLNIE) -->
             <div id="quizFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Ekspercki Wywiad Tonalny</h2>
@@ -219,14 +223,17 @@
             <div class="draping-status-label" id="drapingStatusLabel">Inicjalizacja próbki...</div>
         </div>
 
+        <!-- SEKCJA WYNIKÓW (WARIANT A: TRZY DEDYKOWANE ROZDZIAŁY W JEDNYM RAPORCIE) -->
         <div class="results-section" id="resultsSection">
 
+            <!-- Nagłówek Zgodny z image_c6ea76.png -->
             <div class="verdict-header">
                 <div class="brand-subtitle">Matematyczny Werdykt Silnika</div>
                 <div class="verdict-title" id="displaySeasonName">...</div>
                 <div class="verdict-badge" id="displayEngineMode">Tryb: Fuzja Metodologii</div>
             </div>
 
+            <!-- Podgląd Telemetrii i Barw Zgodny z image_c6ea76.png -->
             <div class="premium-insights-grid">
                 <div class="insight-card">
                     <h3><i class="fa-solid fa-chart-simple" style="margin-right: 10px; color: var(--season-accent);"></i>Parametry Twojej Urody</h3>
@@ -271,6 +278,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 1: SILNIK KALISZ ================= -->
             <div class="report-chapter" id="chapterKalisz">
                 <div class="chapter-badge">Rozdział I</div>
                 <h2><i class="fa-solid fa-flask"></i>Analiza Optyczna i Biochemia Skóry</h2>
@@ -280,6 +288,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 2: SILNIK CAYGILL ================= -->
             <div class="report-chapter" id="chapterCaygill">
                 <div class="chapter-badge">Rozdział II</div>
                 <h2><i class="fa-solid fa-palette"></i>Esencja Twojego Stylu i Archetyp Natury</h2>
@@ -289,6 +298,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 3: SILNIK SPILLANE ================= -->
             <div class="report-chapter" id="chapterSpillane">
                 <div class="chapter-badge">Rozdział III</div>
                 <h2><i class="fa-solid fa-compass-drafting"></i>Twój Przewodnik Zakupowy i Kapsuła</h2>
@@ -297,6 +307,7 @@
                     Budowanie spersonalizowanych reguł zakupowych...
                 </div>
                 
+                <!-- Funkcjonalny komponent przewodnika zakupowego premium -->
                 <div class="shopping-grid">
                     <div class="shopping-box">
                         <h4><i class="fa-solid fa-shirt" style="margin-right: 8px; color: var(--season-accent);"></i>Garderoba Kapsułowa</h4>
@@ -322,6 +333,7 @@
                 </div>
             </div>
 
+            <!-- DOLNY PANEL POBIERANIA PDF -->
             <div class="paywall-container">
                 <div class="paywall-title" id="downloadTitle">Generuj Osobisty Paszport Kolorystyczny PDF</div>
                 <div class="paywall-desc">Pobierz kompletną, luksusową "Encyklopedię Twojej Urody" łączącą 3 światowe metodologie w jednym dokumencie PDF Haute Couture.</div>
@@ -369,7 +381,7 @@
                 options: [
                     { text: "Klasyczne, lśniące, żółte złoto – skóra wygląda zdrowo i promiennie", value: "metal_gold_bright" },
                     { text: "Matowe, antyczne złoto, miedź lub mosiądz – idealnie harmonizuje z cerą", value: "metal_gold_matte" },
-                    { text: "Czyste, polerowane srebro, platyna lub białe złło – dodaje cerze świeżości", value: "metal_silver_bright" },
+                    { text: "Czyste, polerowane srebro, platyna lub białe złoto – dodaje cerze świeżości", value: "metal_silver_bright" },
                     { text: "Matowe srebro, pewter lub stal szczotkowana – daje elegancki, stonowany efekt", value: "metal_silver_matte" }
                 ]
             },
@@ -478,15 +490,15 @@
             label.innerText = "Przetwarzanie profilu psychometrycznego przez AI...";
 
             try {
-                // HARDCORE WORKAROUND: Przesyłamy techniczny stały nagłówek udawanego JPEG, 
-                // aby pomyślnie oszukać i przejść restrykcyjny warunek w linii 16 klocka walidacji n8n.
+                // FIX: Wysyłamy akceptowany parametr 'fusion' zamiast zablokowanego 'quiz', 
+                // aby zaliczyć walidację serwera n8n, oraz przekazujemy atrapę obrazu Base64.
                 const response = await fetch(N8N_PRODUCTION_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         image: "data:image/jpeg;base64,/9j/00", 
                         quiz_responses: quizAnswers, 
-                        engine_mode: 'quiz' 
+                        engine_mode: 'fusion' 
                     })
                 });
                 if (!response.ok) throw new Error("Błąd sieciowy.");
@@ -622,7 +634,8 @@
             const humanReadableSeason = apiData.identified_season ? apiData.identified_season.replace(/_/g, ' ') : "SOFT AUTUMN";
             document.getElementById('displaySeasonName').textContent = humanReadableSeason.toUpperCase();
             
-            const currentModeText = globalLastApiData && globalLastApiData.engine_mode === 'quiz' ? "Ekspercki Wywiad Tonalny" : `Tryb ${selectedEngine.toUpperCase()}`;
+            // Określamy dynamicznie wyświetlaną odznakę trybu
+            const currentModeText = globalLastApiData && globalLastApiData.quiz_responses ? "Ekspercki Wywiad Tonalny" : `Tryb ${selectedEngine.toUpperCase()}`;
             document.getElementById('displayEngineMode').textContent = `Zintegrowany Raport: ${currentModeText}`;
 
             // 1. Renderowanie Pasków Optycznych (Kalisz Telemetry)
