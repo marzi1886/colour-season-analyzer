@@ -475,7 +475,6 @@
             label.innerText = "Przetwarzanie profilu psychometrycznego przez AI...";
 
             try {
-                // Pełny, poprawny nagłówek Base64 1x1 przechodzący walidację n8n Server-Side
                 const fakeImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
                 const response = await fetch(N8N_PRODUCTION_URL, {
@@ -488,11 +487,11 @@
                     })
                 });
                 if (!response.ok) throw new Error("Błąd sieciowy.");
-                const apiData = await response.json();
-                globalLastApiData = apiData;
-
+                
+                const rawText = await response.text();
                 label.style.display = 'none';
-                renderFinalResults(apiData);
+                processHybridResponse(rawText);
+
             } catch (error) {
                 console.error(error);
                 alert("Błąd potoku analitycznego AI Quiz.");
@@ -589,15 +588,16 @@
                     body: JSON.stringify({ image: compressedBase64, engine_mode: selectedEngine })
                 });
                 if (!response.ok) throw new Error("Błąd sieciowy.");
-                const apiData = await response.json();
-                globalLastApiData = apiData;
-
+                
+                const rawText = await response.text();
+                
                 clearInterval(drapesInterval);
                 label.style.display = 'none';
                 frame.classList.remove('analyzing');
                 frame.style.backgroundColor = '#faf9f6';
                 submitBtn.disabled = false;
-                renderFinalResults(apiData);
+                
+                processHybridResponse(rawText);
             } catch (error) {
                 console.error(error);
                 alert("Błąd potoku wizyjnego AI.");
@@ -609,25 +609,61 @@
             }
         }
 
-        function renderFinalResults(apiData) {
-            const results = document.getElementById('resultsSection');
-            results.style.display = 'block';
+        // HYBRID ARCHITECTURE PAYLOAD PARSER
+        function processHybridResponse(rawText) {
+            try {
+                let cleanText = rawText.trim();
+                if (cleanText.startsWith('"') && cleanText.endsWith('"')) {
+                    cleanText = cleanText.substring(1, cleanText.length - 1);
+                }
+                cleanText = cleanText.replace(/\\n/g, '\n').replace(/\\"/g, '"');
 
-            const seasonSlug = apiData.identified_season ? apiData.identified_season.toLowerCase().trim().replace(/ /g, '_') : 'soft_autumn';
-            document.body.className = '';
-            document.body.classList.add(`theme-${seasonSlug}`);
+                const parts = cleanText.split('[SPLIT]');
+                const jsonPart = parts[0].trim();
+                const textPart = parts[1] ? parts[1].trim() : "";
 
-            const humanReadableSeason = apiData.identified_season ? apiData.identified_season.replace(/_/g, ' ') : "SOFT AUTUMN";
-            document.getElementById('displaySeasonName').textContent = humanReadableSeason.toUpperCase();
-            
-            const currentModeText = globalLastApiData && globalLastApiData.quiz_responses ? "Ekspercki Wywiad Tonalny" : `Tryb ${selectedEngine.toUpperCase()}`;
-            document.getElementById('displayEngineMode').textContent = `Zintegrowany Raport: ${currentModeText}`;
+                const apiData = JSON.parse(jsonPart);
+                globalLastApiData = apiData;
 
-            renderBiometricSliders(apiData, seasonSlug);
-            renderLuxeSwatches(seasonSlug);
-            distributeReportToChapters(apiData, humanReadableSeason);
+                const results = document.getElementById('resultsSection');
+                results.style.display = 'block';
 
-            results.scrollIntoView({ behavior: 'smooth' });
+                const seasonSlug = apiData.season ? apiData.season.toLowerCase().trim().replace(/ /g, '_') : 'soft_autumn';
+                document.body.className = '';
+                document.body.classList.add(`theme-${seasonSlug}`);
+                
+                const humanReadableSeason = seasonSlug.replace(/_/g, ' ');
+                document.getElementById('displaySeasonName').textContent = humanReadableSeason.toUpperCase();
+                
+                const currentModeText = quizAnswers.length > 0 ? "Ekspercki Wywiad Tonalny" : `Tryb ${selectedEngine.toUpperCase()}`;
+                document.getElementById('displayEngineMode').textContent = `Zintegrowany Raport: ${currentModeText}`;
+
+                renderBiometricSliders(apiData, seasonSlug);
+                renderLuxeSwatches(seasonSlug);
+
+                // STRATEGIC REPARTITION TO CHAPTERS
+                if (textPart.includes('ROZDZIAL_1') && textPart.includes('ROZDZIAL_2') && textPart.includes('ROZDZIAL_3')) {
+                    const ch1 = textPart.split('ROZDZIAL_1')[1].split('ROZDZIAL_2')[0].trim();
+                    const ch2 = textPart.split('ROZDZIAL_2')[1].split('ROZDZIAL_3')[0].trim();
+                    const ch3 = textPart.split('ROZDZIAL_3')[1].trim();
+
+                    document.getElementById('contentKalisz').innerHTML = ch1;
+                    document.getElementById('contentCaygill').innerHTML = ch2;
+                    document.getElementById('contentSpillane').innerHTML = ch3;
+                } else {
+                    document.getElementById('contentKalisz').innerHTML = textPart || "Wygenerowano pomyślnie profil matematyczny.";
+                    document.getElementById('contentCaygill').innerHTML = "Esencja stylu została zsynchronizowana z profilem głównym.";
+                    document.getElementById('contentSpillane').innerHTML = "Wykorzystaj paletę do budowy szafy kapsułowej.";
+                }
+
+                updateShoppingLists(seasonSlug, apiData);
+                results.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (e) {
+                console.error("Błąd parsowania hybrydowego:", e);
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('contentKalisz').innerHTML = "Raport gotowy. Pobierz swój luksusowy Paszport PDF Haute Couture poniżej, aby przeczytać pełną telemetrię urody.";
+            }
         }
 
         function renderBiometricSliders(apiData, seasonSlug) {
@@ -675,58 +711,7 @@
             fillGroup('palette-avoid', palette.avoid);
         }
 
-        function distributeReportToChapters(apiData, seasonName) {
-            let rawReport = apiData.ai_generated_report || "";
-            
-            if (rawReport.includes("{")) {
-                rawReport = rawReport.split("{")[0];
-            }
-            if (rawReport.includes('", "')) {
-                rawReport = rawReport.split('", "')[0];
-            }
-
-            const opisKalisz = apiData.description || "";
-            const opisCaygill = apiData.style || "";
-            
-            let opisSpillane = "";
-            if (apiData.makeup) {
-                opisSpillane += `<p style="margin-bottom: 15px;"><strong><i class="fa-solid fa-sparkles" style="color: var(--season-accent); margin-right: 6px;"></i> Rekomendacje makijażowe:</strong><br>${apiData.makeup}</p>`;
-            }
-            if (apiData.hair) {
-                opisSpillane += `<p style="margin-bottom: 15px;"><strong><i class="fa-solid fa-scissors" style="color: var(--season-accent); margin-right: 6px;"></i> Koloryzacja i stylizacja włosów:</strong><br>${apiData.hair}</p>`;
-            }
-            
-            if (apiData.celebrities && apiData.celebrities.length > 0) {
-                opisSpillane += `<p style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">`;
-                opisSpillane += `<strong><i class="fa-solid fa-star" style="color: var(--accent-gold); margin-right: 6px;"></i> Twoje globalne ikony stylu (Archetypy siostrzane):</strong><br>`;
-                opisSpillane += `<span style="font-style: italic; color: #5e5c59;">${apiData.celebrities.join(', ')}</span></p>`;
-            }
-
-            const contentKaliszEl = document.getElementById('contentKalisz');
-            if (opisKalisz.trim()) {
-                contentKaliszEl.innerHTML = opisKalisz;
-            } else {
-                contentKaliszEl.innerHTML = `Na podstawie odczytów spektrofotometru optycznego, Twój profil został zaklasyfikowany do grupy: <strong>${seasonName}</strong>.<br>• Dominacja pigmentacji: Skondensowana, o stabilnym rozkładzie melanocytów.<br>• Reakcja naczyniowa: Podton wykazuje optymalny stopień absorpcji fal.`;
-            }
-
-            const contentCaygillEl = document.getElementById('contentCaygill');
-            if (opisCaygill.trim()) {
-                contentCaygillEl.innerHTML = opisCaygill;
-            } else {
-                contentCaygillEl.innerHTML = `Twój archetyp piękna w systemie Suzanne Caygill odpowiada dostojeństwu i harmonii sił natury dla profilu <strong>${seasonName}</strong>.<br>Twoja aura kolorystyczna niesie ze sobą potężny i wyrafinowany ładunek elegancji.`;
-            }
-
-            const contentSpillaneEl = document.getElementById('contentSpillane');
-            if (opisSpillane.trim()) {
-                contentSpillaneEl.innerHTML = opisSpillane;
-            } else {
-                contentSpillaneEl.innerHTML = `Praktyczny przewodnik zakupowy w oparciu o system 12 typów urody.<br>Wybieraj ubrania, które utrzymują profesjonalny poziom kontrastu naturalnego Twojej twarzy. Unikaj barw rozmytych i pastelowych szarości blisko skóry.`;
-            }
-
-            updateShoppingLists(seasonName, apiData);
-        }
-
-        function updateShoppingLists(seasonName, apiData) {
+        function updateShoppingLists(seasonSlug, apiData) {
             const listWardrobe = document.getElementById('shop-wardrobe');
             const listMakeup = document.getElementById('shop-makeup');
             const listAcc = document.getElementById('shop-acc');
