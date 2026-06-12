@@ -19,7 +19,7 @@
             --border-color: #eae8e5;
             --season-accent: #c5a880;
             --season-accent-light: rgba(197, 168, 128, 0.1);
-            --season-gradient: linear-gradient(135deg, #fcfbfa 0%, #f5f2ed100%);
+            --season-gradient: linear-gradient(135deg, #fcfbfa 0%, #f5f2ed 100%);
             
             --cold-color: #5b82a6;
             --warm-color: #d99852;
@@ -158,8 +158,10 @@
 
     <div class="main-container">
 
+        <!-- KARTA INPUTU -->
         <div class="upload-card" id="inputCard">
             
+            <!-- EKRAN STARTOWY: WYBÓR METODOLOGII -->
             <div id="modeSelectionBlock">
                 <h2>Wybierz Tryb Diagnostyki</h2>
                 <div class="brand-subtitle" style="margin-bottom: 10px;">Dopasuj ścieżkę analizy do swoich preferencji</div>
@@ -177,6 +179,7 @@
                 </div>
             </div>
 
+            <!-- BLOK FOTO (UKRYTY DOMYŚLNIE) -->
             <div id="photoFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Rozpocznij Analizę Wizyjną</h2>
@@ -202,6 +205,7 @@
                 <button class="action-btn" id="submitBtn" onclick="runAnalysis()">Uruchom silnik AI</button>
             </div>
 
+            <!-- BLOK QUIZU (UKRYTY DOMYŚLNIE) -->
             <div id="quizFlowBlock" style="display: none;">
                 <button onclick="resetToMenu()" style="background:none; border:none; color:#7c7a77; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i> Powrót do menu</button>
                 <h2>Ekspercki Wywiad Tonalny</h2>
@@ -219,14 +223,17 @@
             <div class="draping-status-label" id="drapingStatusLabel">Inicjalizacja próbki...</div>
         </div>
 
+        <!-- SEKCJA WYNIKÓW (WARIANT A: TRZY DEDYKOWANE ROZDZIAŁY W JEDNYM RAPORCIE) -->
         <div class="results-section" id="resultsSection">
 
+            <!-- Nagłówek Zgodny z image_c6ea76.png -->
             <div class="verdict-header">
                 <div class="brand-subtitle">Matematyczny Werdykt Silnika</div>
                 <div class="verdict-title" id="displaySeasonName">...</div>
                 <div class="verdict-badge" id="displayEngineMode">Tryb: Fuzja Metodologii</div>
             </div>
 
+            <!-- Podgląd Telemetrii i Barw Zgodny z image_c6ea76.png -->
             <div class="premium-insights-grid">
                 <div class="insight-card">
                     <h3><i class="fa-solid fa-chart-simple" style="margin-right: 10px; color: var(--season-accent);"></i>Parametry Twojej Urody</h3>
@@ -271,6 +278,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 1: SILNIK KALISZ ================= -->
             <div class="report-chapter" id="chapterKalisz">
                 <div class="chapter-badge">Rozdział I</div>
                 <h2><i class="fa-solid fa-flask"></i>Analiza Optyczna i Biochemia Skóry</h2>
@@ -280,6 +288,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 2: SILNIK CAYGILL ================= -->
             <div class="report-chapter" id="chapterCaygill">
                 <div class="chapter-badge">Rozdział II</div>
                 <h2><i class="fa-solid fa-palette"></i>Esencja Twojego Stylu i Archetyp Natury</h2>
@@ -289,6 +298,7 @@
                 </div>
             </div>
 
+            <!-- ================= ROZDZIAŁ 3: SILNIK SPILLANE ================= -->
             <div class="report-chapter" id="chapterSpillane">
                 <div class="chapter-badge">Rozdział III</div>
                 <h2><i class="fa-solid fa-compass-drafting"></i>Twój Przewodnik Zakupowy i Kapsuła</h2>
@@ -297,6 +307,7 @@
                     Budowanie spersonalizowanych reguł zakupowych...
                 </div>
                 
+                <!-- Funkcjonalny komponent przewodnika zakupowego premium -->
                 <div class="shopping-grid">
                     <div class="shopping-box">
                         <h4><i class="fa-solid fa-shirt" style="margin-right: 8px; color: var(--season-accent);"></i>Garderoba Kapsułowa</h4>
@@ -322,6 +333,7 @@
                 </div>
             </div>
 
+            <!-- DOLNY PANEL POBIERANIA PDF -->
             <div class="paywall-container">
                 <div class="paywall-title" id="downloadTitle">Generuj Osobisty Paszport Kolorystyczny PDF</div>
                 <div class="paywall-desc">Pobierz kompletną, luksusową "Encyklopedię Twojej Urody" łączącą 3 światowe metodologie w jednym dokumencie PDF Haute Couture.</div>
@@ -404,7 +416,7 @@
                 question: "7. Jaki jest poziom naturalnego kontrastu między Twoją cerą, oczami a włosami?",
                 options: [
                     { text: "Wysoki: Bardzo jasna cera i ciemne włosy/oczy (lub bardzo świetliste spojrzenie)", value: "contrast_high" },
-                    { text: "Niski: Wszystkie elementy są zbliżone jasnością (np. cała sylwetka jasna lub cała ciemna)", value: "contrast_low" },
+                    { text: "Niski: Wszystkie elements są zbliżone jasnością (np. cała sylwetka jasna lub cała ciemna)", value: "contrast_low" },
                     { text: "Średni: Wyważone proporcje, brak skrajności tonalnych", value: "contrast_medium" }
                 ]
             }
@@ -434,6 +446,7 @@
             document.getElementById('resultsSection').style.display = 'none';
             document.getElementById('modeSelectionBlock').style.display = 'block';
             document.body.className = '';
+            compressedBase64 = null; // Czyszczenie flagi zdjęcia przy powrocie
         }
 
         // RENDEROWANIE I LOGIKA QUIZU
@@ -477,10 +490,12 @@
             label.innerText = "Przetwarzanie profilu psychometrycznego przez AI...";
 
             try {
+                // FIX: Dodajemy puste pole "image", aby przejść sztywną walidację n8n Server-Side
                 const response = await fetch(N8N_PRODUCTION_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
+                        image: "",
                         quiz_responses: quizAnswers, 
                         engine_mode: 'quiz' 
                     })
@@ -634,7 +649,7 @@
         }
 
         function renderBiometricSliders(apiData, seasonSlug) {
-            let temp = 75, val = 25, chroma = 55, contrast = 80; // Wzorzec
+            let temp = 75, val = 25, chroma = 55, contrast = 80;
             
             if(apiData.telemetry) {
                 temp = apiData.telemetry.temperature || temp;
@@ -681,7 +696,7 @@
         function distributeReportToChapters(apiData, seasonName) {
             let rawReport = apiData.ai_generated_report || "";
             
-            // FAIL-SAFE: Jeśli model dokleił surowy JSON na końcu, odcinamy od znaku "{" lub cudzysłowów
+            // FAIL-SAFE: Odcinamy surowe struktury JSON, jeśli model je wkleił
             if (rawReport.includes("{")) {
                 rawReport = rawReport.split("{")[0];
             }
@@ -689,11 +704,11 @@
                 rawReport = rawReport.split('", "')[0];
             }
 
-            // EXTRAKCJA OBSZERNYCH DANYCH Z DYNAMICZNEGO JSON-A
+            // EXTRAKCJA OBSZERNYCH DANYCH Z POLA OBJECT JSON
             const opisKalisz = apiData.description || "";
             const opisCaygill = apiData.style || "";
             
-            // Budujemy obszerną i kompletną sekcję praktyczną Spillane'a
+            // Budujemy kompletną i obszerną sekcję praktyczną
             let opisSpillane = "";
             if (apiData.makeup) {
                 opisSpillane += `<p style="margin-bottom: 15px;"><strong><i class="fa-solid fa-sparkles" style="color: var(--season-accent); margin-right: 6px;"></i> Rekomendacje makijażowe:</strong><br>${apiData.makeup}</p>`;
@@ -709,7 +724,7 @@
                 opisSpillane += `<span style="font-style: italic; color: #5e5c59;">${apiData.celebrities.join(', ')}</span></p>`;
             }
 
-            // WSTRZYKIWANIE TREŚCI DO ELEMENTÓW INTERFEJSU
+            // REGENERACJA OKIEN INTERFEJSU
             const contentKaliszEl = document.getElementById('contentKalisz');
             if (opisKalisz.trim()) {
                 contentKaliszEl.innerHTML = opisKalisz;
@@ -746,7 +761,7 @@
                 listWardrobe.innerHTML = `<li><i class="fa-solid fa-check"></i> Klasyczny płaszcz bazowy</li><li><i class="fa-solid fa-check"></i> Monochromatyczne sety</li>`;
             }
 
-            // Dynamiczne wstrzykiwanie kosmetyków i akcentów z tablicy capsule_accents
+            // Dynamiczne wstrzykiwanie kosmetyków z tablicy capsule_accents
             if (apiData.capsule_accents && apiData.capsule_accents.length > 0) {
                 listMakeup.innerHTML = apiData.capsule_accents.map(item => `<li><i class="fa-solid fa-check"></i> Akcent: ${item}</li>`).join('');
             } else {
@@ -808,7 +823,7 @@
                 document.body.removeChild(pdfWrapper);
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE VIP)"; btn.disabled = false;
             }).catch(err => {
-                console.error(err);
+                print.error(err);
                 if(pdfWrapper.parentNode) document.body.removeChild(pdfWrapper);
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE VIP)"; btn.disabled = false;
             });
