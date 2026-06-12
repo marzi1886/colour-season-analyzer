@@ -555,7 +555,8 @@
                 let cleanText = rawText.trim();
                 
                 if (cleanText.includes('```json')) {
-                    cleanText = cleanText.split('```json')[1].split('```')[0].trim();
+                    cleanText = cleanText.split('
+```json')[1].split('```')[0].trim();
                 } else if (cleanText.startsWith('```')) {
                     cleanText = cleanText.split('
 ```')[1].split('```')[0].trim();
