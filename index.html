@@ -322,6 +322,8 @@
         let compressedBase64 = null;
         let globalLastApiData = null;
         let drapesInterval = null;
+        let currentQuizStep = 0;
+        let quizAnswers = [];
 
         const QUIZ_QUESTIONS = [
             {
@@ -352,9 +354,6 @@
                 ]
             }
         ];
-
-        let currentQuizStep = 0;
-        let quizAnswers = [];
 
         function initiateFlow(type) {
             document.getElementById('modeSelectionBlock').style.display = 'none';
@@ -555,11 +554,9 @@
                 let cleanText = rawText.trim();
                 
                 if (cleanText.includes('```json')) {
-                    cleanText = cleanText.split('
-```json')[1].split('```')[0].trim();
+                    cleanText = cleanText.split('```json')[1].split('```')[0].trim();
                 } else if (cleanText.startsWith('```')) {
-                    cleanText = cleanText.split('
-```')[1].split('```')[0].trim();
+                    cleanText = cleanText.split('```')[1].split('```')[0].trim();
                 }
 
                 if (cleanText.startsWith('"') && cleanText.endsWith('"')) {
@@ -581,7 +578,8 @@
                 document.body.classList.add(`theme-${seasonSlug}`);
                 document.getElementById('displaySeasonName').textContent = seasonSlug.replace(/_/g, ' ').toUpperCase();
                 
-                const currentModeText = quizAnswers.length > 0 ? "Ekspercki Wywiad Tonalny" : `Tryb ${selectedEngine.toUpperCase()}`;
+                const isQuizActive = (typeof quizAnswers !== 'undefined' && quizAnswers && quizAnswers.length > 0);
+                const currentModeText = isQuizActive ? "Ekspercki Wywiad Tonalny" : `Tryb ${selectedEngine.toUpperCase()}`;
                 document.getElementById('displayEngineMode').textContent = `Zintegrowany Raport: ${currentModeText}`;
 
                 renderBiometricSliders(apiData, seasonSlug);
@@ -636,6 +634,7 @@
             const palette = SYSTEM_PALETTES[seasonSlug] || SYSTEM_PALETTES['soft_autumn'];
             const fillGroup = (id, colors) => {
                 const el = document.getElementById(id);
+                if (!el) return;
                 el.innerHTML = '';
                 colors.forEach(c => {
                     const s = document.createElement('div');
@@ -660,9 +659,9 @@
 
             const fallbacks = LUXE_STATIC_FALLBACKS[category];
 
-            listWardrobe.innerHTML = fallbacks.wardrobe.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
-            listMakeup.innerHTML = fallbacks.makeup.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
-            listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish || fallbacks.jewelry}</li><li><i class="fa-solid fa-check"></i> Wyważona struktura matów i błysków</li>`;
+            if(listWardrobe) listWardrobe.innerHTML = fallbacks.wardrobe.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
+            if(listMakeup) listMakeup.innerHTML = fallbacks.makeup.map(item => `<li><i class="fa-solid fa-check"></i> ${item}</li>`).join('');
+            if(listAcc) listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish || fallbacks.jewelry}</li><li><i class="fa-solid fa-check"></i> Wyważona struktura matów i błysków</li>`;
         }
 
         function generateSecurePDF() {
