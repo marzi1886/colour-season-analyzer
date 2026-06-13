@@ -112,7 +112,8 @@
         .swatch-flex { display: flex; gap: 8px; flex-wrap: wrap; }
         .color-swatch { width: 45px; height: 45px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.05); }
 
-        .report-chapter { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 45px; margin-bottom: 35px; text-align: left; position: relative; }
+        /* PDF FIX: Wymuszamy na silniku pdf zezwolenie na naturalne łamanie stron wewnątrz rozdziałów */
+        .report-chapter { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 45px; margin-bottom: 35px; text-align: left; position: relative; page-break-inside: auto !important; }
         .chapter-badge { position: absolute; top: 20px; right: 25px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-gold); }
         .report-chapter h2 { font-size: 1.5rem; margin-bottom: 20px; color: var(--text-primary); display: flex; align-items: center; gap: 12px; }
         .report-chapter h2 i { color: var(--season-accent); font-size: 1.3rem; }
@@ -213,7 +214,7 @@
             <div class="draping-status-label" id="drapingStatusLabel">Inicjalizacja próbki...</div>
         </div>
 
-        <div class="results-section" id="resultsSection" id="printableArea">
+        <div class="results-section" id="resultsSection">
 
             <div class="verdict-header">
                 <div class="brand-subtitle">Matematyczny Werdykt Silnika</div>
@@ -555,9 +556,11 @@
                 let cleanText = rawText.trim();
                 
                 if (cleanText.includes('```json')) {
-                    cleanText = cleanText.split('```json')[1].split('```')[0].trim();
+                    cleanText = cleanText.split('
+```json')[1].split('```')[0].trim();
                 } else if (cleanText.startsWith('```')) {
-                    cleanText = cleanText.split('```')[1].split('```')[0].trim();
+                    cleanText = cleanText.split('
+```')[1].split('```')[0].trim();
                 }
 
                 if (cleanText.startsWith('"') && cleanText.endsWith('"')) {
@@ -667,7 +670,6 @@
             if(listAcc) listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish || fallbacks.jewelry}</li><li><i class="fa-solid fa-check"></i> Wyważona struktura matów i błysków</li>`;
         }
 
-        // WYMUSZENIE RE-PAINTU PRZEGLĄDARKI: Renderujemy bezpośrednio widoczny na ekranie blok wyników
         function generateSecurePDF() {
             if (!globalLastApiData) { 
                 alert('Paszport nie jest jeszcze gotowy. Proszę poczekać na zakończenie analizy AI.'); 
@@ -677,12 +679,10 @@
             const btn = document.getElementById('downloadPdfBtn');
             btn.innerText = "GENEROWANIE ENCYKLOPEDII..."; btn.disabled = true;
 
-            // ZMIANA STRATEGII: html2canvas ma problem ze stylami dynamicznymi wstrzykiwanymi do ukrytych węzłów.
-            // Zamiast klonować wewnętrzny HTML do nowego, sztucznego elementu, zrzucimy BEZPOŚREDNIO 
-            // kontener 'resultsSection', który przeglądarka już idealnie wyrenderowała na ekranie!
             const elementToPrint = document.getElementById('resultsSection');
 
-            // Konfiguracja parametrów generowania dokumentu premium
+            // ZMIANA REGUŁY STRONICOWANIA: Przełączamy tryb breaks na 'css' 
+            // i pozwalamy wewnętrznym blokom tekstu na naturalne dzielenie linii.
             const options = {
                 margin: [15, 15, 15, 15],
                 filename: `Paszport_Kolorystyczny_${document.getElementById('displaySeasonName').textContent.replace(/ /g, '_')}.pdf`,
@@ -694,10 +694,10 @@
                     letterRendering: true
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                // Słuchamy wyłącznie deklaracji CSS w strukturze dokumentu, eliminując agresywne ucinanie bloków
+                pagebreak: { mode: 'css' }
             };
 
-            // Uruchomienie bezpiecznego procesu konwersji widoku do PDF
             html2pdf().set(options).from(elementToPrint).save().then(() => {
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE VIP)"; 
                 btn.disabled = false;
