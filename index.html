@@ -105,7 +105,7 @@
         .metric-meta { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .metric-track { width: 100%; height: 6px; background: #f0ede9; border-radius: 3px; position: relative; margin: 4px 0; }
         .metric-bar { height: 100%; width: 0%; border-radius: 3px; background: var(--season-accent); transition: width 1.5s cubic-bezier(0.1, 1, 0.1, 1); }
-        .metric-labels { display: flex; justify-content: space-between; font-size: 0.7 camp; color: #7c7a77; }
+        .metric-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #7c7a77; }
         
         .swatch-group { margin-bottom: 20px; }
         .swatch-group-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: #4a4947; }
@@ -376,7 +376,7 @@
             document.getElementById('modeSelectionBlock').style.display = 'block';
             document.body.className = '';
             compressedBase64 = null;
-            globalLastApiData = null; // Czyszczenie pamięci po powrocie do menu
+            globalLastApiData = null;
         }
 
         function renderQuizQuestion() {
@@ -571,7 +571,6 @@
 
                 const apiData = JSON.parse(jsonPart);
                 
-                // SYSTEM STATE LOCK: Dane zapisujemy globalnie dopiero, gdy upewnimy się, że JSON jest poprawny
                 globalLastApiData = apiData;
 
                 document.getElementById('resultsSection').style.display = 'block';
@@ -603,7 +602,12 @@
                 }
 
                 updateShoppingLists(seasonSlug, apiData);
-                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+                
+                // ASYNC DOM RENDER DEBOUNCE: Opóźniamy przewijanie widoku o 300ms,
+                // dając silnikowi przeglądarki pełny czas na zapisanie i ustabilizowanie zmian w DOM.
+                setTimeout(() => {
+                    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+                }, 300);
 
             } catch (e) {
                 console.error("Krytyczny błąd przetwarzania:", e);
@@ -665,13 +669,11 @@
             if(listAcc) listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish || fallbacks.jewelry}</li><li><i class="fa-solid fa-check"></i> Wyważona struktura matów i błysków</li>`;
         }
 
-        // DYNAMIC CONTEXT GENERATOR: Nowa, ulepszona funkcja zabezpieczająca przed pobraniem pustego pliku
         function generateSecurePDF() {
             const contentKalisz = document.getElementById('contentKalisz').innerText;
             const contentCaygill = document.getElementById('contentCaygill').innerText;
             const contentSpillane = document.getElementById('contentSpillane').innerText;
 
-            // WARSTWA 1: Sprawdzenie, czy silnik AI w ogóle przekazał dane do interfejsu (Zabezpieczenie UX)
             if (!globalLastApiData || contentKalisz.includes('Wczytywanie') || contentKalisz === "") { 
                 alert('Paszport nie jest jeszcze gotowy. Proszę poczekać, aż raport AI wyświetli się w całości na stronie.'); 
                 return; 
@@ -680,7 +682,6 @@
             const btn = document.getElementById('downloadPdfBtn');
             btn.innerText = "GENEROWANIE ENCYKLOPEDII..."; btn.disabled = true;
 
-            // WARSTWA 2: Dynamiczne mapowanie – pobieramy dokładnie to, co w tym momencie widzi użytkownik
             const currentSeasonName = document.getElementById('displaySeasonName').textContent;
             const currentModeName = document.getElementById('displayEngineMode').textContent;
 
@@ -718,7 +719,6 @@
             
             document.body.appendChild(pdfWrapper);
             
-            // WARSTWA 3: Renderowanie pliku PDF
             html2pdf().set({ 
                 margin: 20, 
                 filename: `Paszport_Kolorystyczny_${currentSeasonName.replace(/ /g, '_')}.pdf`, 
