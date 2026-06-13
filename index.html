@@ -166,7 +166,7 @@
                     <div class="selection-box" onclick="initiateFlow('quiz')">
                         <i class="fa-solid fa-clipboard-question"></i>
                         <h3>Wywiad Tonalny</h3>
-                        <p>Odpowiedz na pytania ekspertów dotyczące Twoich pigmentów i reakcji na światło.</p>
+                        <p>Odpowiedz na pytania experts dotyczące Twoich pigmentów i reakcji na światło.</p>
                     </div>
                 </div>
             </div>
@@ -555,9 +555,11 @@
                 let cleanText = rawText.trim();
                 
                 if (cleanText.includes('```json')) {
-                    cleanText = cleanText.split('```json')[1].split('```')[0].trim();
+                    cleanText = cleanText.split('
+```json')[1].split('```')[0].trim();
                 } else if (cleanText.startsWith('```')) {
-                    cleanText = cleanText.split('```')[1].split('```')[0].trim();
+                    cleanText = cleanText.split('
+```')[1].split('```')[0].trim();
                 }
 
                 if (cleanText.startsWith('"') && cleanText.endsWith('"')) {
@@ -667,7 +669,7 @@
             if(listAcc) listAcc.innerHTML = `<li><i class="fa-solid fa-check"></i> Kruszec: ${apiData.jewelry_finish || fallbacks.jewelry}</li><li><i class="fa-solid fa-check"></i> Wyważona struktura matów i błysków</li>`;
         }
 
-        // KULOODPORNA GENERACJA PDF - POBIERA ZAWSZE CAŁOŚĆ TEKSTU Z UI NIEZALEŻNIE OD FORMATOWANIA KLUCZY
+        // NOWA, KULOODPORNA GENERACJA DOM-INJECTION (WYMUSZA RENDEROWANIE PRZEGLĄDARKI)
         function generateSecurePDF() {
             const contentKalisz = document.getElementById('contentKalisz').innerHTML;
             const contentCaygill = document.getElementById('contentCaygill').innerHTML;
@@ -685,9 +687,10 @@
             const currentModeName = document.getElementById('displayEngineMode').textContent;
 
             const pdfWrapper = document.createElement('div');
-            pdfWrapper.style.cssText = "position:absolute; left:-9999px; top:0; width:750px; background:#ffffff; color:#1c1b1a; padding:50px; box-sizing:border-box; font-family:Georgia, serif;";
+            // ZMIANA ARCHITEKTONICZNA: Wstrzykujemy element na sam dół dokumentu (widoczny DOM), 
+            // stylizujemy go na białe tło z pełną widocznością, ale ukrywamy pod spodem za pomocą niskiego z-index i opacity 0.01.
+            pdfWrapper.style.cssText = "position:fixed; bottom:0; left:0; width:750px; background:#ffffff; color:#1c1b1a; padding:50px; box-sizing:border-box; font-family:Georgia, serif; opacity:0.01; z-index:-9999; pointer-events:none;";
             
-            // JEŚLI STRUKTURA ROZDZIAŁÓW JEST PUSTA, ZBIERAMY WSZYSTKO CO WYRENDEROWAŁ INTERFEJS, ŻEBY UNIKNĄĆ BIAŁEJ STRONY
             pdfWrapper.innerHTML = `
                 <div style="border-bottom:2px solid #c5a880; padding-bottom:20px; margin-bottom:30px; text-align:center;">
                     <h1 style="font-size:28px; margin:0; text-transform:uppercase; letter-spacing:2px; color:#1c1b1a;">AI Color Atelier</h1>
@@ -716,19 +719,23 @@
                 </div>
             `;
             
+            // Wstrzykujemy fizycznie do drzewa renderowania strony
             document.body.appendChild(pdfWrapper);
             
+            // Odpalamy generator
             html2pdf().set({ 
                 margin: 20, 
                 filename: `Paszport_Kolorystyczny_${currentSeasonName.replace(/ /g, '_')}.pdf`, 
                 jsPDF: { format: 'a4', orientation: 'portrait' },
                 html2canvas: { scale: 2, useCORS: true, logging: false }
             }).from(pdfWrapper).save().then(() => {
+                // Po udanym zrzucie natychmiast usuwamy węzeł z DOM, żeby nie śmiecić
                 document.body.removeChild(pdfWrapper);
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE VIP)"; 
                 btn.disabled = false;
             }).catch(err => {
                 console.error("PDF Error:", err);
+                if (pdfWrapper.parentNode) document.body.removeChild(pdfWrapper);
                 btn.innerText = "POBIERZ PASZPORT PDF (FREE VIP)";
                 btn.disabled = false;
             });
